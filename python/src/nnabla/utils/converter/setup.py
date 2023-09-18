@@ -1,5 +1,4 @@
-# Copyright 2020,2021 Sony Corporation.
-# Copyright 2021 Sony Group Corporation.
+# Copyright 2023 Sony Group Corporation.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +22,6 @@ import pathlib
 from setuptools import setup
 
 if __name__ == '__main__':
-    ############################################################################
     # Get version info
     root_dir = os.path.realpath(os.path.dirname(__file__))
     a = dict()
@@ -35,6 +33,12 @@ if __name__ == '__main__':
         __author__ = a['__author__']
     if '__email__' in a:
         __email__ = a['__email__']
+
+    whl_suffix = ''
+    if 'WHEEL_SUFFIX' in os.environ:
+        whl_suffix += os.environ['WHEEL_SUFFIX']
+
+    nnabla_version = f'nnabla{whl_suffix}==1.36.0'
 
     install_requires = [
         'tensorboard>=2.6.0, <=2.9.0',
@@ -48,13 +52,14 @@ if __name__ == '__main__':
         'tflite2onnx',
         'flatbuffers',
         'pyopenssl',
-        'certifi'
+        'certifi',
+        nnabla_version
     ]
 
-    ############################################################################
     # Package information
 
     pkg_name = "nnabla_converter"
+    pkg_name += whl_suffix
     tensorflow_src_dir = os.path.join(root_dir, 'tensorflow')
     onnx_src_dir = os.path.join(root_dir, 'onnx')
     tflite_src_dir = os.path.join(root_dir, "tflite")

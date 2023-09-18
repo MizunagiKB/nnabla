@@ -15,6 +15,12 @@
 
 set(LIB_NAME nnabla${LIB_NAME_SUFFIX})
 
+if (NBLA_BUILD_SHARED_LIBS)
+  set(nbla_SHARED_OR_STATIC "SHARED")
+else ()
+  set(nbla_SHARED_OR_STATIC "STATIC")
+endif()
+
 file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   ./*.cpp
   memory/*.cpp
@@ -43,7 +49,7 @@ if (WIN32)
   list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 endif()
 
-add_library(${LIB_NAME} SHARED ${SOURCES})
+add_library(${LIB_NAME} ${nbla_SHARED_OR_STATIC} ${SOURCES})
 
 target_link_libraries(${LIB_NAME} ${NBLA_LINKER_LIBS})
 set_property(TARGET ${LIB_NAME} PROPERTY CXX_STANDARD 14)

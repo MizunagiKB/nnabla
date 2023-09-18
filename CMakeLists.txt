@@ -25,6 +25,7 @@ project (nbla C CXX)
 # Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/build-tools/cmake/Modules)
 list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CMAKE_FIND_ROOT_PATH})
+include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Download.cmake)
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 
 ###############################################################################
@@ -34,6 +35,8 @@ option(BUILD_CPP_UTILS "Build C++ API and utilities" OFF)
 option(BUILD_PYTHON_PACKAGE "Build python package" ON)
 option(MAKE_MANYLINUX_WHEEL "Convert wheel to manylinux version" OFF)
 
+option(NBLA_BUILD_SHARED_LIBS "NNabla build shared Libraries" ON)
+
 option(NBLA_VERBOSE_MEMORY_USAGE "Enable debug print of memory usage" OFF)
 if(NBLA_VERBOSE_MEMORY_USAGE)
   add_definitions(-DNBLA_VERBOSE_MEMORY_USAGE)
@@ -42,6 +45,8 @@ endif()
 ###############################################################################
 # Settings
 ###############################################################################
+set(NBLA_ROOT_CMAKE_DIR ${CMAKE_SOURCE_DIR})
+
 if (NOT PYTHON_COMMAND_NAME)
   if(NOT PYTHON_VERSION_MAJOR)
     set(PYTHON_COMMAND_NAME "python3")
@@ -61,9 +66,38 @@ endif()
 set(PYTHON_COMMAND "${PP}")
 
 
-if(NOT EXISTS ${PROTOC_COMMAND})
-  find_program(PROTOC_COMMAND protoc)
+# preprocess Build Protoclbuffers
+download_and_extract_library(protobuf-3.19.6 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.6.zip DIRECTORY)
+if(NBLA_BUILD_SHARED_LIBS)
+  set(BUILD_SHARED_LIBS ON CACHE BOOL "Protobuf Build shared Libraries" FORCE)
+else()
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "Protobuf Build shared Libraries" FORCE)
 endif()
+file(MAKE_DIRECTORY third_party/protobuf-3.19.6/build.cmake)
+if(NBLA_BUILD_SHARED_LIBS)
+  execute_process(
+    COMMAND
+    cmake "-DBUILD_SHARED_LIBS=ON" "-DCMAKE_POSITION_INDEPENDENT_CODE=ON" "-Dprotobuf_BUILD_TESTS=OFF" "../cmake"
+    WORKING_DIRECTORY
+    "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
+  )
+else()
+  execute_process(
+    COMMAND
+    cmake "-DBUILD_SHARED_LIBS=OFF" "-DCMAKE_POSITION_INDEPENDENT_CODE=ON" "-Dprotobuf_BUILD_TESTS=OFF" "../cmake"
+    WORKING_DIRECTORY
+    "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
+  )
+endif()
+execute_process(
+  COMMAND
+  make
+  WORKING_DIRECTORY
+  "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
+)
+
+
+find_program(PROTOC_COMMAND protoc "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake")
 if(NOT EXISTS ${PROTOC_COMMAND})
   # If find_program fails.
   message(FATAL_ERROR, "protoc not found. Please install protocol buffer compiler.")
@@ -75,6 +109,7 @@ if (NOT CMAKE_BUILD_TYPE)
     "Build type release is default on single-configuration build system like GNU make."
     FORCE)
 endif()
+
 
 ###############################################################################
 # Preprocessing

@@ -15,6 +15,12 @@
 
 set(LIB_NAME nnabla_utils${LIB_NAME_SUFFIX})
 
+if (NBLA_BUILD_SHARED_LIBS)
+  set(nbla_utils_SHARED_OR_STATIC "SHARED")
+else ()
+  set(nbla_utils_SHARED_OR_STATIC "STATIC")
+endif()
+
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 
 option(NNABLA_UTILS_WITH_HDF5 "Enable HDF5 in C++ utils." OFF)
@@ -45,6 +51,7 @@ if (UNIX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
+
 # NPY is prior option, if it is ON,
 # data iterator is set to NPY, and hdf5
 # is disabled.
@@ -70,7 +77,7 @@ if (NNABLA_UTILS_WITH_HDF5)
   add_definitions(-DNBLA_UTILS_WITH_HDF5)
 endif()
 
-add_library(${LIB_NAME} SHARED
+add_library(${LIB_NAME} ${nbla_utils_SHARED_OR_STATIC}
   ${nbla_utils_SOURCES}
 )
 
@@ -105,12 +112,12 @@ if (WIN32)
   endif()
 
 else()
-  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    if (NNABLA_UTILS_WITH_HDF5)
-      message(FATAL_ERROR, "HDF5 cannot be enabled on macOS.")
-      error() # Undefined command to abort cmake process here.
-    endif()
-  endif()
+  # if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  #   if (NNABLA_UTILS_WITH_HDF5)
+  #     message(FATAL_ERROR, "HDF5 cannot be enabled on macOS.")
+  #     error() # Undefined command to abort cmake process here.
+  #   endif()
+  # endif()
   if (ANDROID)
     include_directories(/usr/local/android/arm64/include)
     add_library(Protobuf STATIC IMPORTED)
@@ -123,15 +130,51 @@ else()
                          PROPERTIES IMPORTED_LOCATION 
                          /usr/local/android/arm64/lib/libarchive.so) 
   else()
-    find_package(Protobuf REQUIRED)
-    find_package(LibArchive REQUIRED)
+
+    set(ZSTD_LIBRARY "${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake/lib/libzstd.a")
+
+    set(LibArchive_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/libarchive")
+    set(
+      LibArchive_LIBRARIES
+      ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake/libarchive/libarchive.a
+    )
+
+    set(
+      PROTOBUF_INCLUDE_DIR
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/src"
+    )
+    set(
+      PROTOBUF_LIBRARY
+      ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/libprotobuf.a
+      ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/libprotoc.a
+    )
+
+    set(
+      HDF5_INCLUDE_DIRS
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/src"
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/hl/src"
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/src"
+    )
+    set(
+      HDF5_HL_LIBRARIES
+      ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/libhdf5_hl.a
+    )
+    set(
+      HDF5_LIBRARIES
+      ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/libhdf5.a
+    )
+
+    # find_package(Protobuf REQUIRED)
+    # find_package(LibArchive REQUIRED)
   endif()
+
   if (NNABLA_UTILS_WITH_HDF5)
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
-    findhdf5()
+    # findhdf5()
   endif()
+
   find_package(ZLIB REQUIRED)
   if (NNABLA_UTILS_STATIC_LINK_DEPS)
     if (NNABLA_UTILS_WITH_HDF5)
@@ -167,6 +210,7 @@ else()
       ${PROTOBUF_LIBRARY}
       ${LibArchive_LIBRARIES}
       ${ZLIB_LIBRARIES}
+      ${ZSTD_LIBRARY}
       )
   endif()
   if (NNABLA_UTILS_WITH_HDF5)

@@ -1,53 +1,102 @@
-function(download_and_extract_library NAME EXT URL TYPE)
-  if((NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/third_party/${NAME} AND ${TYPE} STREQUAL "DIRECTORY") OR
-    (NOT EXISTS ${CMAKE_SOURCE_DIR}/third_party/${NAME} AND ${TYPE} STREQUAL "BINARY"))
-    message("Downloading ${NAME}")
-    file(DOWNLOAD
-      ${URL}
-      ${CMAKE_SOURCE_DIR}/third_party/${NAME}${EXT}
-      SHOW_PROGRESS
-      STATUS status
-      LOG log)
-    list(GET status 0 status_code)
-    list(GET status 1 status_string)
-    if(NOT status_code EQUAL 0)
-      if(UNIX OR APPLE)
-        message("Failed to download ${NAME}. Try to download with wget.")
-        execute_process(
-          COMMAND wget ${WGET_OPTS} ${URL} -O ${CMAKE_SOURCE_DIR}/third_party/${NAME}${EXT})
-      else()
-        message(FATAL_ERROR "Failed to download ${NAME}. Please check network connection and proxy settings.
-        status_code: ${status_code}
-        status_string: ${status_string}
-        log: ${log}
-        ")
-        error() # Place Unknown command to stop cmake process here.
-      endif()
+#
+download_and_extract_library(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip DIRECTORY)
+download_and_extract_library(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip DIRECTORY)
+file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake)
+if(NBLA_BUILD_SHARED_LIBS)
+  set(ZSTD_BUILD_SHARED "ON")
+  set(ZSTD_BUILD_STATIC "OFF")
+else()
+  set(ZSTD_BUILD_SHARED "OFF")
+  set(ZSTD_BUILD_STATIC "ON")
+endif()
+execute_process(
+  COMMAND
+  cmake "../build/cmake"
+    "-DZSTD_PROGRAMS_LINK_SHARED=${NBLA_BUILD_SHARED_LIBS}"
+    "-DZSTD_BUILD_SHARED=${ZSTD_BUILD_SHARED}"
+    "-DZSTD_BUILD_STATIC=${ZSTD_BUILD_STATIC}"
+  WORKING_DIRECTORY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake
+)
+execute_process(
+  COMMAND
+  make
+  WORKING_DIRECTORY
+  ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake
+)
 
-    endif()
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -E
-      chdir ${CMAKE_SOURCE_DIR}/third_party
-      ${CMAKE_COMMAND} -E tar xf ${NAME}${EXT})
-  endif()
-endfunction()
+#
+download_and_extract_library(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip DIRECTORY)
+file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake)
+execute_process(
+  COMMAND
+  cmake ".."
+    "-DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}"
+    "-DENABLE_NETTLE=OFF"
+    "-DENABLE_OPENSSL=OFF"
+    "-DENABLE_LZO=OFF"
+    "-DENABLE_LZMA=OFF"
+    "-DENABLE_BZip2=OFF"
+    "-DENABLE_LIBXML2=OFF"
+    "-DENABLE_EXPAT=OFF"
+    "-DENABLE_PCREPOSIX=OFF"
+    "-DENABLE_LibGCC=OFF"
+    "-DENABLE_CNG=OFF"
+    "-DENABLE_TAR=OFF"
+    "-DENABLE_TAR_SHARED=OFF"
+    "-DENABLE_CPIO=OFF"
+    "-DENABLE_CPIO_SHARED=OFF"
+    "-DENABLE_CAT=OFF"
+    "-DENABLE_CAT_SHARED=OFF"
+    "-DENABLE_XATTR=OFF"
+    "-DENABLE_ACL=OFF"
+    "-DENABLE_ICONV=OFF"
+    "-DENABLE_TEST=OFF"
+    "-DZLIB_INCLUDE_DIR=${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3"
+    "-DZLIB_LIBRARY_RELEASE=ON"
+  WORKING_DIRECTORY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
+)
+execute_process(
+  COMMAND
+  make
+  WORKING_DIRECTORY
+  ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
+)
+
 
 if(NNABLA_UTILS_WITH_HDF5)
   set(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT OFF)
-  download_and_extract_library(hdf5-master .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip DIRECTORY)
+  download_and_extract_library(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip DIRECTORY)
   set(HDF5_EXTERNALLY_CONFIGURED, 1)
   set(HDF5_EXPORTED_TARGETS "nbla_utils-hdf5-targets")
-  set(BUILD_SHARED_LIBS ON CACHE BOOL "Build Shared Libraries" FORCE)
-  set(ONLY_SHARED_LIBS ON CACHE BOOL "Only build shared libraries" FORCE)
-  set(HDF5_BUILD_HL_LIB  ON CACHE BOOL "Build HIGH Level HDF5 Library" FORCE)
-  if(NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/third_party/hdf5-master)
-    file(RENAME hdf5-hdf5-1_12_2 hdf5-master)
+  file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake)
+  if(NBLA_BUILD_SHARED_LIBS)
+    execute_process(
+      COMMAND
+      cmake "-DBUILD_SHARED_LIBS=ON" "HDF5_BUILD_HL_LIB=ON" ".."
+      WORKING_DIRECTORY
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
+    )
+  else()
+    execute_process(
+      COMMAND
+      cmake "-DBUILD_SHARED_LIBS=OFF" "HDF5_BUILD_HL_LIB=ON" ".."
+      WORKING_DIRECTORY
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
+    )
   endif()
-  add_subdirectory(hdf5-master)
-  install(EXPORT nbla_utils-hdf5-targets DESTINATION "trash")
+  execute_process(
+    COMMAND
+    make
+    WORKING_DIRECTORY
+    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
+  )
 endif()
 
+
 download_and_extract_library(eigen-3.3.5 .zip https://gitlab.com/libeigen/eigen/-/archive/3.3.5/eigen-3.3.5.zip DIRECTORY)
+
 
 set(flatbuffers_info
   "https://github.com/google/flatbuffers/releases/download/v2.0.0/Mac.flatc.binary.zip\;flatc\;flatc_mac"

@@ -15,6 +15,12 @@
 
 set(LIB_NAME nnabla_cli${LIB_NAME_SUFFIX})
 
+if (NBLA_BUILD_SHARED_LIBS)
+  set(nbla_cli_SHARED_OR_STATIC "SHARED")
+else ()
+  set(nbla_cli_SHARED_OR_STATIC "STATIC")
+endif()
+
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 if (WIN32)
   # Use simulated cxxabi.h since it is not appeared in MSVC. 
@@ -55,7 +61,7 @@ set_property(TARGET nbla PROPERTY CXX_STANDARD 14)
 
 # nbla_cli shared library
 add_library(${LIB_NAME}
-  SHARED
+  ${nbla_cli_SHARED_OR_STATIC}
   internal.cpp
   nbla_train.cpp
   nbla_dump.cpp
