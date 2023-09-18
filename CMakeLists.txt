@@ -74,21 +74,15 @@ else()
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "Protobuf Build shared Libraries" FORCE)
 endif()
 file(MAKE_DIRECTORY third_party/protobuf-3.19.6/build.cmake)
-if(NBLA_BUILD_SHARED_LIBS)
-  execute_process(
-    COMMAND
-    cmake "-DBUILD_SHARED_LIBS=ON" "-DCMAKE_POSITION_INDEPENDENT_CODE=ON" "-Dprotobuf_BUILD_TESTS=OFF" "../cmake"
-    WORKING_DIRECTORY
+execute_process(
+  COMMAND
+  cmake "../cmake"
+    "-DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}"
+    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+    "-Dprotobuf_BUILD_TESTS=OFF"
+  WORKING_DIRECTORY
     "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
-  )
-else()
-  execute_process(
-    COMMAND
-    cmake "-DBUILD_SHARED_LIBS=OFF" "-DCMAKE_POSITION_INDEPENDENT_CODE=ON" "-Dprotobuf_BUILD_TESTS=OFF" "../cmake"
-    WORKING_DIRECTORY
-    "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
-  )
-endif()
+)
 execute_process(
   COMMAND
   make

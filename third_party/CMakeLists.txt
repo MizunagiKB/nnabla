@@ -32,28 +32,35 @@ execute_process(
   COMMAND
   cmake ".."
     "-DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}"
+    "-DENABLE_MBEDTLS=OFF"
     "-DENABLE_NETTLE=OFF"
     "-DENABLE_OPENSSL=OFF"
+    "-DENABLE_LIBB2=ON"
+    "-DENABLE_LZ4=ON"
     "-DENABLE_LZO=OFF"
     "-DENABLE_LZMA=OFF"
+    "-DENABLE_ZSTD=ON"
+    "-DENABLE_ZLIB=ON"
     "-DENABLE_BZip2=OFF"
     "-DENABLE_LIBXML2=OFF"
     "-DENABLE_EXPAT=OFF"
     "-DENABLE_PCREPOSIX=OFF"
-    "-DENABLE_LibGCC=OFF"
+    "-DENABLE_LIBGCC=OFF"
     "-DENABLE_CNG=OFF"
     "-DENABLE_TAR=OFF"
-    "-DENABLE_TAR_SHARED=OFF"
+    "-DENABLE_TAR_SHARED=FALSE"
     "-DENABLE_CPIO=OFF"
-    "-DENABLE_CPIO_SHARED=OFF"
+    "-DENABLE_CPIO_SHARED=FALSE"
     "-DENABLE_CAT=OFF"
-    "-DENABLE_CAT_SHARED=OFF"
+    "-DENABLE_CAT_SHARED=FALSE"
+    "-DENABLE_UNZIP=FALSE"
+    "-DENABLE_UNZIP_SHARED=FALSE"
     "-DENABLE_XATTR=OFF"
     "-DENABLE_ACL=OFF"
     "-DENABLE_ICONV=OFF"
     "-DENABLE_TEST=OFF"
+    "-DENABLE_COVERAGE=FALSE"
     "-DZLIB_INCLUDE_DIR=${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3"
-    "-DZLIB_LIBRARY_RELEASE=ON"
   WORKING_DIRECTORY
     ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
 )
@@ -71,26 +78,20 @@ if(NNABLA_UTILS_WITH_HDF5)
   set(HDF5_EXTERNALLY_CONFIGURED, 1)
   set(HDF5_EXPORTED_TARGETS "nbla_utils-hdf5-targets")
   file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake)
-  if(NBLA_BUILD_SHARED_LIBS)
-    execute_process(
-      COMMAND
-      cmake "-DBUILD_SHARED_LIBS=ON" "HDF5_BUILD_HL_LIB=ON" ".."
-      WORKING_DIRECTORY
+  execute_process(
+    COMMAND
+    cmake ".."
+      "-DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}"
+      "-DHDF5_BUILD_HL_LIB=ON"
+    WORKING_DIRECTORY
       "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
-    )
-  else()
-    execute_process(
-      COMMAND
-      cmake "-DBUILD_SHARED_LIBS=OFF" "HDF5_BUILD_HL_LIB=ON" ".."
-      WORKING_DIRECTORY
-      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
-    )
-  endif()
+  )
   execute_process(
     COMMAND
     make
     WORKING_DIRECTORY
     "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
+    
   )
 endif()
 
