@@ -1,5 +1,5 @@
 #
-download_and_extract_library(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip DIRECTORY)
+# download_and_extract_library(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip DIRECTORY)
 download_and_extract_library(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip DIRECTORY)
 file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake)
 if(NBLA_BUILD_SHARED_LIBS)
@@ -18,16 +18,31 @@ execute_process(
   WORKING_DIRECTORY
     ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake
 )
-execute_process(
-  COMMAND
-  make
-  WORKING_DIRECTORY
-  ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake
-)
+if (WIN32)
+  execute_process(
+    COMMAND
+    MSBuild
+      "zstd.sln" "/t:build" "/p:Configuration=Release"
+    WORKING_DIRECTORY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake
+  )
+else()
+  execute_process(
+    COMMAND
+    make
+    WORKING_DIRECTORY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake
+  )
+endif()
 
 #
 download_and_extract_library(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip DIRECTORY)
 file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake)
+if(WIN32)
+  set(ENABLE_LIBGCC "ON")
+else()
+  set(ENABLE_LIBGCC "OFF")
+endif()
 execute_process(
   COMMAND
   cmake ".."
@@ -45,32 +60,41 @@ execute_process(
     "-DENABLE_LIBXML2=OFF"
     "-DENABLE_EXPAT=OFF"
     "-DENABLE_PCREPOSIX=OFF"
-    "-DENABLE_LIBGCC=OFF"
+    "-DENABLE_LIBGCC=${ENABLE_LIBGCC}"
     "-DENABLE_CNG=OFF"
     "-DENABLE_TAR=OFF"
-    "-DENABLE_TAR_SHARED=FALSE"
+    "-DENABLE_TAR_SHARED=OFF"
     "-DENABLE_CPIO=OFF"
-    "-DENABLE_CPIO_SHARED=FALSE"
+    "-DENABLE_CPIO_SHARED=OFF"
     "-DENABLE_CAT=OFF"
-    "-DENABLE_CAT_SHARED=FALSE"
-    "-DENABLE_UNZIP=FALSE"
-    "-DENABLE_UNZIP_SHARED=FALSE"
+    "-DENABLE_CAT_SHARED=OFF"
+    "-DENABLE_UNZIP=OFF"
+    "-DENABLE_UNZIP_SHARED=OFF"
     "-DENABLE_XATTR=OFF"
     "-DENABLE_ACL=OFF"
     "-DENABLE_ICONV=OFF"
     "-DENABLE_TEST=OFF"
-    "-DENABLE_COVERAGE=FALSE"
+    "-DENABLE_COVERAGE=OFF"
     "-DZLIB_INCLUDE_DIR=${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3"
   WORKING_DIRECTORY
     ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
 )
-execute_process(
-  COMMAND
-  make
-  WORKING_DIRECTORY
-  ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
-)
-
+if(WIN32)
+  execute_process(
+    COMMAND
+    MSBuild
+      "libarchive.sln" "/t:build" "/p:Configuration=Release"
+    WORKING_DIRECTORY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
+  )
+else()
+  execute_process(
+    COMMAND
+    make
+    WORKING_DIRECTORY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake
+  )
+endif()
 
 if(NNABLA_UTILS_WITH_HDF5)
   set(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT OFF)
@@ -86,13 +110,23 @@ if(NNABLA_UTILS_WITH_HDF5)
     WORKING_DIRECTORY
       "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
   )
-  execute_process(
-    COMMAND
-    make
-    WORKING_DIRECTORY
-    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
-    
-  )
+  if(WIN32)
+    execute_process(
+      COMMAND
+      MSBuild
+        "HDF5.sln" "/t:build" "/p:Configuration=Release"
+      WORKING_DIRECTORY
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
+      
+    )
+  else()
+    execute_process(
+      COMMAND
+      make
+      WORKING_DIRECTORY
+      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake"
+    )
+  endif()
 endif()
 
 

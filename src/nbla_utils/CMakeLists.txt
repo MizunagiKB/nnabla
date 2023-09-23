@@ -82,9 +82,48 @@ add_library(${LIB_NAME} ${nbla_utils_SHARED_OR_STATIC}
 )
 
 if (WIN32)
-  find_package(LibArchive REQUIRED)
-  find_package(ZLIB REQUIRED)
-  find_package(Protobuf REQUIRED)
+  set(ZSTD_LIBRARY "${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake/lib/Release/zstd_static.lib")
+
+  set(LibArchive_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/libarchive")
+  set(
+    LibArchive_LIBRARIES
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake/libarchive/Release/archive.lib
+  )
+
+  set(ZLIB_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3")
+  set(
+    ZLIB_LIBRARIES
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3/build.cmake/Release/zlib.lib
+  )
+
+  set(
+    PROTOBUF_INCLUDE_DIR
+    "${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/src"
+  )
+  set(
+    PROTOBUF_LIBRARY
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/Release/libprotobuf.lib
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/Release/libprotoc.lib
+  )
+
+  set(
+    HDF5_INCLUDE_DIRS
+    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/src"
+    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/hl/src"
+    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/src"
+  )
+  set(
+    HDF5_HL_LIBRARIES
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/Release/libhdf5_hl.lib
+  )
+  set(
+    HDF5_LIBRARIES
+    ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/Release/libhdf5.lib
+  )
+
+  # find_package(LibArchive REQUIRED)
+  # find_package(ZLIB REQUIRED)
+  # find_package(Protobuf REQUIRED)
   include_directories(
     ${LibArchive_INCLUDE_DIR}
     ${PROTOBUF_INCLUDE_DIR}
@@ -101,7 +140,7 @@ if (WIN32)
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
-    findhdf5()
+    # findhdf5()
     include_directories(
       ${HDF5_INCLUDE_DIRS}
     )
@@ -175,7 +214,7 @@ else()
     # findhdf5()
   endif()
 
-  find_package(ZLIB REQUIRED)
+  # find_package(ZLIB REQUIRED)
   if (NNABLA_UTILS_STATIC_LINK_DEPS)
     if (NNABLA_UTILS_WITH_HDF5)
       set(HDF5_LIBRARIES ${HDF5_LIBRARIES} ${CMAKE_DL_LIBS})
