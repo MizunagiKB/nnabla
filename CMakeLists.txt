@@ -53,9 +53,12 @@ if (NOT CMAKE_BUILD_TYPE)
     FORCE)
 endif()
 
-if(${NBLA_BUILD_SHARED_LIBS} EQUAL OFF)
-  set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-  set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+if(${NBLA_BUILD_SHARED_LIBS} STREQUAL OFF)
+  add_definitions(-Dnnabla_EXPORTS)
+  add_definitions(-Dnnabla_utils_EXPORTS)
+  add_definitions(-Dnnabla_cli_EXPORTS)
+  # set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+  # set(CMAKE_CXX_FLAGS_RELEASE "/MD")
 endif()
 
 # 
@@ -155,6 +158,9 @@ set(CPACK_PACKAGE_VERSION_MINOR ${version_minor})
 set(CPACK_PACKAGE_VERSION_PATCH ${version_patch})
 set(CPACK_PACKAGE_CONTACT "nnabla@googlegroups.com")
 
+
+if(SKIP)
+
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/src/nbla/proto)
 execute_process(
   COMMAND
@@ -181,6 +187,7 @@ if (${CMAKE_SOURCE_DIR}/src/nbla/proto/nnabla.proto
   endif ()
 endif()
 
+
 if (${CMAKE_SOURCE_DIR}/src/nbla/proto/nnabla.proto
     IS_NEWER_THAN
     ${CMAKE_SOURCE_DIR}/src/nbla_utils/nnabla.pb.cc)
@@ -195,6 +202,8 @@ execute_process(
     message(FATAL_ERROR "protoc for C++ failed.")
   endif ()
 endif()
+
+endif() # SKIP
 
 ###############################################################################
 # C++ Library
@@ -245,22 +254,20 @@ if(BUILD_CPP_LIB)
     ${CMAKE_SOURCE_DIR}/third_party/eigen-3.3.5
     ${CMAKE_SOURCE_DIR}/include/third_party)
 
+
   if(BUILD_CPP_UTILS)
     list(APPEND NBLA_INCLUDE_DIRS
       ${CMAKE_SOURCE_DIR}/third_party/cmdline-master)
   endif()
 
   include_directories(${NBLA_INCLUDE_DIRS};${PROJECT_BINARY_DIR})
-  add_definitions(-Dnnabla_EXPORTS)
   add_subdirectory(src/nbla)
 
   ###############################################################################
   # C++ Utilities
   ###############################################################################
   if(BUILD_CPP_UTILS)
-    add_definitions(-Dnnabla_utils_EXPORTS)
     add_subdirectory(src/nbla_utils)
-    add_definitions(-Dnnabla_cli_EXPORTS)
     add_subdirectory(src/nbla_cli)
     # add_subdirectory(examples/cpp) // 
   endif()
@@ -329,6 +336,7 @@ if(BUILD_CPP_LIB)
     ${CMAKE_CURRENT_SOURCE_DIR}/python/setup.cfg-$<CONFIG>)
 
 endif() # BUILD_CPP_LIB
+
 
 ###############################################################################
 # Python API

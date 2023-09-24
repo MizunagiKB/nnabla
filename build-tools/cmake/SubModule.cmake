@@ -7,41 +7,42 @@ function(build_libarchive NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
   set(NBLA_LIBARCHIVE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   file(MAKE_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
-  execute_process(
-    COMMAND cmake ..
-            -DCMAKE_CXX_FLAGS_DEBUG=/MTd
-            -DCMAKE_CXX_FLAGS_RELEASE=/MT
-            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
-            -DENABLE_MBEDTLS=OFF
-            -DENABLE_NETTLE=OFF
-            -DENABLE_OPENSSL=OFF
-            -DENABLE_LIBB2=ON
-            -DENABLE_LZ4=ON
-            -DENABLE_LZO=OFF
-            -DENABLE_LZMA=OFF
-            -DENABLE_ZSTD=ON
-            -DENABLE_ZLIB=ON
-            -DENABLE_BZip2=OFF
-            -DENABLE_LIBXML2=OFF
-            -DENABLE_EXPAT=OFF
-            -DENABLE_PCREPOSIX=OFF
-            -DENABLE_LIBGCC=OFF
-            -DENABLE_CNG=OFF
-            -DENABLE_TAR=OFF
-            -DENABLE_TAR_SHARED=OFF
-            -DENABLE_CPIO=OFF
-            -DENABLE_CPIO_SHARED=OFF
-            -DENABLE_CAT=OFF
-            -DENABLE_CAT_SHARED=OFF
-            -DENABLE_UNZIP=OFF
-            -DENABLE_UNZIP_SHARED=OFF
-            -DENABLE_XATTR=OFF
-            -DENABLE_ACL=OFF
-            -DENABLE_ICONV=OFF
-            -DENABLE_TEST=OFF
-            -DENABLE_COVERAGE=OFF
-            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-    WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
+  if(RUN_CMAKE)
+    execute_process(
+      COMMAND cmake ..
+              -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
+              -DENABLE_MBEDTLS=OFF
+              -DENABLE_NETTLE=OFF
+              -DENABLE_OPENSSL=OFF
+              -DENABLE_LIBB2=ON
+              -DENABLE_LZ4=ON
+              -DENABLE_LZO=OFF
+              -DENABLE_LZMA=OFF
+              -DENABLE_ZSTD=ON
+              -DENABLE_ZLIB=ON
+              -DENABLE_BZip2=OFF
+              -DENABLE_LIBXML2=OFF
+              -DENABLE_EXPAT=OFF
+              -DENABLE_PCREPOSIX=OFF
+              -DENABLE_LIBGCC=OFF
+              -DENABLE_CNG=OFF
+              -DENABLE_TAR=OFF
+              -DENABLE_TAR_SHARED=OFF
+              -DENABLE_CPIO=OFF
+              -DENABLE_CPIO_SHARED=OFF
+              -DENABLE_CAT=OFF
+              -DENABLE_CAT_SHARED=OFF
+              -DENABLE_UNZIP=OFF
+              -DENABLE_UNZIP_SHARED=OFF
+              -DENABLE_XATTR=OFF
+              -DENABLE_ACL=OFF
+              -DENABLE_ICONV=OFF
+              -DENABLE_TEST=OFF
+              -DENABLE_COVERAGE=OFF
+              -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
+              -DZSTD_INCLUDE_DIR=${ZSTD_INCLUDE_DIR}
+      WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
+  endif() # RUN_CMAKE
 
   if(WIN32)
     if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
@@ -50,12 +51,16 @@ function(build_libarchive NAME EXT URL)
       set(DEBUG_SUFFIX "")
     endif()
 
-    execute_process(
-      COMMAND cmake --build .
-      WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
+    #execute_process(
+    #  COMMAND cmake --build .
+    #  WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
+    set(NBLA_LIBARCHIVE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive)
 
-    set(LibArchive_INCLUDE_DIR ${NBLA_LIBARCHIVE_DIR}/libarchive PARENT_SCOPE)
-    set(LibArchive_LIBRARIES ${NBLA_LIBARCHIVE_DIR}/build.cmake/libarchive/${CMAKE_BUILD_TYPE}/archive.lib PARENT_SCOPE)
+    # set(LibArchive_INCLUDE_DIR ${NBLA_LIBARCHIVE_DIR}/libarchive PARENT_SCOPE)
+    # set(LibArchive_LIBRARIES ${NBLA_LIBARCHIVE_DIR}/build.cmake/libarchive/${CMAKE_BUILD_TYPE}/archive.lib PARENT_SCOPE)
+
+    set(LibArchive_INCLUDE_DIR ${NBLA_LIBARCHIVE_DIR}/include PARENT_SCOPE)
+    set(LibArchive_LIBRARIES ${NBLA_LIBARCHIVE_DIR}/lib/archive.lib PARENT_SCOPE)
 
   else()
     execute_process(
@@ -76,10 +81,9 @@ function(build_hdf5 NAME EXT URL)
   set(NBLA_HDF5_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   file(MAKE_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
 
+  if(RUN_CMAKE)
   execute_process(
     COMMAND cmake ..
-            -DCMAKE_CXX_FLAGS_DEBUG=/MTd
-            -DCMAKE_CXX_FLAGS_RELEASE=/MT
             -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
             -DHDF5_BUILD_HL_LIB=ON
             -DHDF5_EXPORTED_TARGETS=nbla_utils-hdf5-targets
@@ -88,6 +92,7 @@ function(build_hdf5 NAME EXT URL)
             -DHDF5_BUILD_EXAMPLES=OFF
             -DBUILD_TESTING=OFF
     WORKING_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
+  endif() # RUN_CMAKE
 
   if(WIN32)
     if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
@@ -96,20 +101,19 @@ function(build_hdf5 NAME EXT URL)
       set(DEBUG_SUFFIX "")
     endif()
 
-    execute_process(
-      COMMAND cmake --build .
-      WORKING_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
+    #execute_process(
+    #  COMMAND cmake --build .
+    #  WORKING_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
 
+    set(NBLA_HDF5_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/HDF5-1.14.3.3b5b26b-win64)
+
+    set(HDF5_INCLUDE_DIRS ${NBLA_HDF5_DIR}/include PARENT_SCOPE)
     set(
-      HDF5_INCLUDE_DIRS ${NBLA_HDF5_DIR}/build.cmake/src
-                        ${NBLA_HDF5_DIR}/hl/src
-                        ${NBLA_HDF5_DIR}/src
-      PARENT_SCOPE)
-    set(
-        HDF5_LIBRARIES ${NBLA_HDF5_DIR}/build.cmake/bin/${CMAKE_BUILD_TYPE}/libhdf5${DEBUG_SUFFIX}.lib
-                       ${NBLA_HDF5_DIR}/build.cmake/bin/${CMAKE_BUILD_TYPE}/libhdf5_tools${DEBUG_SUFFIX}.lib
+        HDF5_LIBRARIES ${NBLA_HDF5_DIR}/lib/hdf5.lib
+                       ${NBLA_HDF5_DIR}/lib/hdf5_hl.lib
+                       ${NBLA_HDF5_DIR}/lib/hdf5_tools.lib
         PARENT_SCOPE)
-    set(HDF5_HL_LIBRARIES ${NBLA_HDF5_DIR}/build.cmake/bin/${CMAKE_BUILD_TYPE}/libhdf5_hl${DEBUG_SUFFIX}.lib PARENT_SCOPE)
+    set(HDF5_HL_LIBRARIES PARENT_SCOPE)
 
   else()
     execute_process(
@@ -135,8 +139,6 @@ function(build_protobuf NAME EXT URL)
   file(MAKE_DIRECTORY ${NBLA_PROTOBUF_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ../cmake
-            -DCMAKE_CXX_FLAGS_DEBUG=/MTd
-            -DCMAKE_CXX_FLAGS_RELEASE=/MT
             -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON
             -Dprotobuf_BUILD_TESTS=OFF
@@ -195,8 +197,6 @@ function(build_zlib NAME EXT URL)
 
     execute_process(
       COMMAND cmake --build .
-              -DCMAKE_CXX_FLAGS_DEBUG=/MTd
-              -DCMAKE_CXX_FLAGS_RELEASE=/MT
       WORKING_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
 
     set(ZLIB_INCLUDE_DIR ${NBLA_ZLIB_DIR} PARENT_SCOPE)
@@ -232,8 +232,6 @@ function(build_zstd NAME EXT URL)
   endif()
   execute_process(
     COMMAND cmake ../build/cmake
-            -DCMAKE_CXX_FLAGS_DEBUG=/MTd
-            -DCMAKE_CXX_FLAGS_RELEASE=/MT
             -DZSTD_PROGRAMS_LINK_SHARED=${NBLA_BUILD_SHARED_LIBS}
             -DZSTD_BUILD_SHARED=${ZSTD_BUILD_SHARED}
             -DZSTD_BUILD_STATIC=${ZSTD_BUILD_STATIC}
@@ -249,6 +247,8 @@ function(build_zstd NAME EXT URL)
     execute_process(
       COMMAND cmake --build .
       WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
+
+    set(ZSTD_INCLUDE_DIR ${NBLA_ZSTD_DIR}/lib PARENT_SCOPE)
 
     if(NBLA_BUILD_SHARED_LIBS)
       set(ZSTD_LIBRARY ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib PARENT_SCOPE)
