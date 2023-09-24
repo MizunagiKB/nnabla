@@ -25,7 +25,7 @@ project (nbla C CXX)
 # Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/build-tools/cmake/Modules)
 list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CMAKE_FIND_ROOT_PATH})
-include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Download.cmake)
+include(${CMAKE_SOURCE_DIR}/build-tools/cmake/SubModule.cmake)
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 
 ###############################################################################
@@ -47,9 +47,18 @@ endif()
 ###############################################################################
 set(NBLA_ROOT_CMAKE_DIR ${CMAKE_SOURCE_DIR})
 
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-# set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+    "Build type release is default on single-configuration build system like GNU make."
+    FORCE)
+endif()
 
+if(${NBLA_BUILD_SHARED_LIBS} EQUAL OFF)
+  set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+  set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+endif()
+
+# 
 if (NOT PYTHON_COMMAND_NAME)
   if(NOT PYTHON_VERSION_MAJOR)
     set(PYTHON_COMMAND_NAME "python3")
@@ -70,77 +79,21 @@ set(PYTHON_COMMAND "${PP}")
 
 
 # zlib
-download_and_extract_library(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip DIRECTORY)
-file(MAKE_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3/build.cmake)
-execute_process(
-  COMMAND
-  cmake ".."
-  WORKING_DIRECTORY
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3/build.cmake
-)
-if (WIN32)
-  execute_process(
-    COMMAND
-    MSBuild
-      "zlib.sln" "/t:build" "/p:Configuration=Release"
-    WORKING_DIRECTORY
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3/build.cmake
-  )
+build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip)
+# zstd
+build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
+# protobuf
+build_protobuf(protobuf-3.19.6 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.6.zip)
+# libarchive
+build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
+# hdf5
+build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 
-  set(ZLIB_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3")
-  set(
-    ZLIB_LIBRARIES
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3/build.cmake/Release/zlib.lib
-  )
-else()
-endif()
-
-# preprocess Build Protoclbuffers
-download_and_extract_library(protobuf-3.19.6 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.6.zip DIRECTORY)
-if(NBLA_BUILD_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ON CACHE BOOL "Protobuf Build shared Libraries" FORCE)
-else()
-  set(BUILD_SHARED_LIBS OFF CACHE BOOL "Protobuf Build shared Libraries" FORCE)
-endif()
-file(MAKE_DIRECTORY third_party/protobuf-3.19.6/build.cmake)
-execute_process(
-  COMMAND
-  cmake "../cmake"
-    "-DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}"
-    "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
-    "-Dprotobuf_BUILD_TESTS=OFF"
-  WORKING_DIRECTORY
-    "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
-)
-if (WIN32)
-  execute_process(
-    COMMAND
-    MSBuild
-      "protobuf.sln" "/t:build" "/p:Configuration=Release"
-    WORKING_DIRECTORY
-    "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
-  )
-  find_program(PROTOC_COMMAND protoc "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake/Release")
-else()
-  execute_process(
-    COMMAND
-    make
-    WORKING_DIRECTORY
-    "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake"
-  )
-  find_program(PROTOC_COMMAND protoc "${CMAKE_SOURCE_DIR}/third_party/protobuf-3.19.6/build.cmake")
-endif()
 
 if(NOT EXISTS ${PROTOC_COMMAND})
   # If find_program fails.
   message(FATAL_ERROR, "protoc not found. Please install protocol buffer compiler.")
   error() # Place Unknown command to stop cmake process here.
-endif()
-
-if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-    "Build type release is default on single-configuration build system like GNU make."
-    FORCE)
 endif()
 
 
@@ -202,7 +155,7 @@ set(CPACK_PACKAGE_VERSION_MINOR ${version_minor})
 set(CPACK_PACKAGE_VERSION_PATCH ${version_patch})
 set(CPACK_PACKAGE_CONTACT "nnabla@googlegroups.com")
 
-file(MAKE_DIRECTORY  ${CMAKE_SOURCE_DIR}/src/nbla/proto)
+file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/src/nbla/proto)
 execute_process(
   COMMAND
   ${PYTHON_COMMAND}

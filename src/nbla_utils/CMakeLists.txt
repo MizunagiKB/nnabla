@@ -82,45 +82,6 @@ add_library(${LIB_NAME} ${nbla_utils_SHARED_OR_STATIC}
 )
 
 if (WIN32)
-  set(ZSTD_LIBRARY "${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake/lib/Release/zstd_static.lib")
-
-  set(LibArchive_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/libarchive")
-  set(
-    LibArchive_LIBRARIES
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake/libarchive/Release/archive.lib
-  )
-
-  set(ZLIB_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3")
-  set(
-    ZLIB_LIBRARIES
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/zlib-1.3/build.cmake/Release/zlib.lib
-  )
-
-  set(
-    PROTOBUF_INCLUDE_DIR
-    "${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/src"
-  )
-  set(
-    PROTOBUF_LIBRARY
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/Release/libprotobuf.lib
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/Release/libprotoc.lib
-  )
-
-  set(
-    HDF5_INCLUDE_DIRS
-    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/src"
-    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/hl/src"
-    "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/src"
-  )
-  set(
-    HDF5_HL_LIBRARIES
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/Release/libhdf5_hl.lib
-  )
-  set(
-    HDF5_LIBRARIES
-    ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/Release/libhdf5.lib
-  )
-
   # find_package(LibArchive REQUIRED)
   # find_package(ZLIB REQUIRED)
   # find_package(Protobuf REQUIRED)
@@ -169,40 +130,6 @@ else()
                          PROPERTIES IMPORTED_LOCATION 
                          /usr/local/android/arm64/lib/libarchive.so) 
   else()
-
-    set(ZSTD_LIBRARY "${NBLA_ROOT_CMAKE_DIR}/third_party/zstd-1.5.5/build.cmake/lib/libzstd.a")
-
-    set(LibArchive_INCLUDE_DIR "${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/libarchive")
-    set(
-      LibArchive_LIBRARIES
-      ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive-3.7.2/build.cmake/libarchive/libarchive.a
-    )
-
-    set(
-      PROTOBUF_INCLUDE_DIR
-      "${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/src"
-    )
-    set(
-      PROTOBUF_LIBRARY
-      ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/libprotobuf.a
-      ${NBLA_ROOT_CMAKE_DIR}/third_party/protobuf-3.19.6/build.cmake/libprotoc.a
-    )
-
-    set(
-      HDF5_INCLUDE_DIRS
-      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/src"
-      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/hl/src"
-      "${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/src"
-    )
-    set(
-      HDF5_HL_LIBRARIES
-      ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/libhdf5_hl.a
-    )
-    set(
-      HDF5_LIBRARIES
-      ${NBLA_ROOT_CMAKE_DIR}/third_party/hdf5-hdf5-1_12_2/build.cmake/bin/libhdf5.a
-    )
-
     # find_package(Protobuf REQUIRED)
     # find_package(LibArchive REQUIRED)
   endif()
