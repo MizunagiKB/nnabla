@@ -186,6 +186,7 @@ function(build_zlib NAME EXT URL)
   file(MAKE_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
+            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
     WORKING_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME}/build.cmake)
 
   if(WIN32)
@@ -200,7 +201,7 @@ function(build_zlib NAME EXT URL)
       WORKING_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
 
     set(ZLIB_INCLUDE_DIR ${NBLA_ZLIB_DIR} PARENT_SCOPE)
-    if(NBLA_BUILD_SHARED_LIBS)
+    if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
       set(ZLIB_LIBRARIES ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib PARENT_SCOPE)
     else()
       set(ZLIB_LIBRARIES ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib PARENT_SCOPE)
@@ -210,8 +211,8 @@ function(build_zlib NAME EXT URL)
 
   message("  <<build_zlib>>")
   message("  - ZLIB_INCLUDE_DIR = " ${NBLA_ZLIB_DIR})
-  if(NBLA_BUILD_SHARED_LIBS)
-      message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib)
+  if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
+    message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib)
   else()
       message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib)
   endif()
@@ -225,6 +226,7 @@ function(build_zstd NAME EXT URL)
   file(MAKE_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ../build/cmake
+            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
     WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
 
   if(WIN32)
@@ -240,7 +242,7 @@ function(build_zstd NAME EXT URL)
 
     set(ZSTD_INCLUDE_DIR ${NBLA_ZSTD_DIR}/lib PARENT_SCOPE)
 
-    if(NBLA_BUILD_SHARED_LIBS)
+    if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
       set(ZSTD_LIBRARY ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib PARENT_SCOPE)
     else()
       set(ZSTD_LIBRARY ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd_static.lib PARENT_SCOPE)
@@ -253,7 +255,8 @@ function(build_zstd NAME EXT URL)
   endif()
 
   message("  <<build_zstd>>")
-  if(NBLA_BUILD_SHARED_LIBS)
+  message("  - ZSTD_INCLUDE_DIR = " ${NBLA_ZSTD_DIR}/lib PARENT_SCOPE)
+  if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
     message("  - ZSTD_LIBRARY = " ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib)
   else()
     message("  - ZSTD_LIBRARY = " ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd_static.lib)
