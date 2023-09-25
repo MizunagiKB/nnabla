@@ -140,7 +140,6 @@ function(build_protobuf NAME EXT URL)
   execute_process(
     COMMAND cmake ../cmake
             -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
-            -DCMAKE_POSITION_INDEPENDENT_CODE=ON
             -Dprotobuf_BUILD_TESTS=OFF
     WORKING_DIRECTORY ${NBLA_PROTOBUF_DIR}/build.cmake)
 
@@ -255,7 +254,7 @@ function(build_zstd NAME EXT URL)
   endif()
 
   message("  <<build_zstd>>")
-  message("  - ZSTD_INCLUDE_DIR = " ${NBLA_ZSTD_DIR}/lib PARENT_SCOPE)
+  message("  - ZSTD_INCLUDE_DIR = " ${NBLA_ZSTD_DIR}/lib)
   if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
     message("  - ZSTD_LIBRARY = " ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib)
   else()
