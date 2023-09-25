@@ -45,6 +45,7 @@ list(APPEND nbla_utils_SOURCES
   nnp_impl_configs.cpp
   nnp_network_expander.cpp
   parameters.cpp
+  dummy.cc
 )
 
 if (UNIX)
@@ -91,10 +92,10 @@ if (WIN32)
     ${ZLIB_INCLUDE_DIRS}
     )
   target_link_libraries(${LIB_NAME}
-    ${NBLA_LIBRARY_NAME}
-    ${PROTOBUF_LIBRARY}
-    ${LibArchive_LIBRARIES}
     ${ZLIB_LIBRARIES}
+    ${LibArchive_LIBRARIES}
+    ${PROTOBUF_LIBRARY}
+    ${NBLA_LIBRARY_NAME}
     )
 
   if (NNABLA_UTILS_WITH_HDF5)

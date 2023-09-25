@@ -2,47 +2,45 @@
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Download.cmake)
 
 
+# =============================================================================
 # libarchive
 function(build_libarchive NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
   set(NBLA_LIBARCHIVE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   file(MAKE_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
-  if(RUN_CMAKE)
-    execute_process(
-      COMMAND cmake ..
-              -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
-              -DENABLE_MBEDTLS=OFF
-              -DENABLE_NETTLE=OFF
-              -DENABLE_OPENSSL=OFF
-              -DENABLE_LIBB2=ON
-              -DENABLE_LZ4=ON
-              -DENABLE_LZO=OFF
-              -DENABLE_LZMA=OFF
-              -DENABLE_ZSTD=ON
-              -DENABLE_ZLIB=ON
-              -DENABLE_BZip2=OFF
-              -DENABLE_LIBXML2=OFF
-              -DENABLE_EXPAT=OFF
-              -DENABLE_PCREPOSIX=OFF
-              -DENABLE_LIBGCC=OFF
-              -DENABLE_CNG=OFF
-              -DENABLE_TAR=OFF
-              -DENABLE_TAR_SHARED=OFF
-              -DENABLE_CPIO=OFF
-              -DENABLE_CPIO_SHARED=OFF
-              -DENABLE_CAT=OFF
-              -DENABLE_CAT_SHARED=OFF
-              -DENABLE_UNZIP=OFF
-              -DENABLE_UNZIP_SHARED=OFF
-              -DENABLE_XATTR=OFF
-              -DENABLE_ACL=OFF
-              -DENABLE_ICONV=OFF
-              -DENABLE_TEST=OFF
-              -DENABLE_COVERAGE=OFF
-              -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-              -DZSTD_INCLUDE_DIR=${ZSTD_INCLUDE_DIR}
-      WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
-  endif() # RUN_CMAKE
+  execute_process(
+    COMMAND cmake ..
+            # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
+            -DENABLE_MBEDTLS=OFF
+            -DENABLE_NETTLE=OFF
+            -DENABLE_OPENSSL=OFF
+            -DENABLE_LIBB2=ON
+            -DENABLE_LZ4=ON
+            -DENABLE_LZO=OFF
+            -DENABLE_LZMA=OFF
+            -DENABLE_ZSTD=ON
+            -DENABLE_ZLIB=ON
+            -DENABLE_BZip2=OFF
+            -DENABLE_LIBXML2=OFF
+            -DENABLE_EXPAT=OFF
+            -DENABLE_PCREPOSIX=OFF
+            -DENABLE_CNG=OFF
+            -DENABLE_TAR=OFF
+            -DENABLE_TAR_SHARED=OFF
+            -DENABLE_CPIO=OFF
+            -DENABLE_CPIO_SHARED=OFF
+            -DENABLE_CAT=OFF
+            -DENABLE_CAT_SHARED=OFF
+            -DENABLE_UNZIP=OFF
+            -DENABLE_UNZIP_SHARED=OFF
+            -DENABLE_XATTR=OFF
+            -DENABLE_ACL=OFF
+            -DENABLE_ICONV=OFF
+            -DENABLE_TEST=OFF
+            -DENABLE_COVERAGE=OFF
+            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
+            -DZSTD_INCLUDE_DIR=${ZSTD_INCLUDE_DIR}
+    WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
 
   if(WIN32)
     if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
@@ -51,16 +49,15 @@ function(build_libarchive NAME EXT URL)
       set(DEBUG_SUFFIX "")
     endif()
 
-    #execute_process(
-    #  COMMAND cmake --build .
-    #  WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
-    set(NBLA_LIBARCHIVE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/libarchive)
+    execute_process(
+      COMMAND cmake --build .
+      WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
 
-    # set(LibArchive_INCLUDE_DIR ${NBLA_LIBARCHIVE_DIR}/libarchive PARENT_SCOPE)
-    # set(LibArchive_LIBRARIES ${NBLA_LIBARCHIVE_DIR}/build.cmake/libarchive/${CMAKE_BUILD_TYPE}/archive.lib PARENT_SCOPE)
+    set(TMP_INC_DIR ${NBLA_LIBARCHIVE_DIR}/libarchive)
+    set(TMP_LIB ${NBLA_LIBARCHIVE_DIR}/build.cmake/libarchive/${CMAKE_BUILD_TYPE}/archive.lib)
 
-    set(LibArchive_INCLUDE_DIR ${NBLA_LIBARCHIVE_DIR}/include PARENT_SCOPE)
-    set(LibArchive_LIBRARIES ${NBLA_LIBARCHIVE_DIR}/lib/archive.lib PARENT_SCOPE)
+    set(LibArchive_INCLUDE_DIR ${TMP_INC_DIR} PARENT_SCOPE)
+    set(LibArchive_LIBRARIES ${TMP_LIB} PARENT_SCOPE)
 
   else()
     execute_process(
@@ -69,12 +66,13 @@ function(build_libarchive NAME EXT URL)
   endif()
 
   message("  <<build_libarchive>>")
-  message("  - LibArchive_INCLUDE_DIR = " ${NBLA_LIBARCHIVE_DIR}/libarchive)
-  message("  - LibArchive_LIBRARIES = " ${NBLA_LIBARCHIVE_DIR}/build.cmake/libarchive/${CMAKE_BUILD_TYPE}/archive.lib)
+  message("  - LibArchive_INCLUDE_DIR = " ${TMP_INC_DIR})
+  message("  - LibArchive_LIBRARIES = " ${TMP_LIB})
 
 endfunction()
 
 
+# =============================================================================
 # hdf5
 function(build_hdf5 NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
@@ -84,7 +82,7 @@ function(build_hdf5 NAME EXT URL)
   if(RUN_CMAKE)
   execute_process(
     COMMAND cmake ..
-            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
+            # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
             -DHDF5_BUILD_HL_LIB=ON
             -DHDF5_EXPORTED_TARGETS=nbla_utils-hdf5-targets
             -DHDF5_EXTERNALLY_CONFIGURED=1
@@ -107,13 +105,14 @@ function(build_hdf5 NAME EXT URL)
 
     set(NBLA_HDF5_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/HDF5-1.14.3.3b5b26b-win64)
 
-    set(HDF5_INCLUDE_DIRS ${NBLA_HDF5_DIR}/include PARENT_SCOPE)
-    set(
-        HDF5_LIBRARIES ${NBLA_HDF5_DIR}/lib/hdf5.lib
-                       ${NBLA_HDF5_DIR}/lib/hdf5_hl.lib
-                       ${NBLA_HDF5_DIR}/lib/hdf5_tools.lib
-        PARENT_SCOPE)
-    set(HDF5_HL_LIBRARIES PARENT_SCOPE)
+    set(TMP_INC_DIR ${NBLA_HDF5_DIR}/include)
+    set(TMP_LIB_1 ${NBLA_HDF5_DIR}/lib/hdf5.lib)
+    set(TMP_LIB_2 ${NBLA_HDF5_DIR}/lib/hdf5_hl.lib)
+    set(TMP_LIB_3 "")
+
+    set(HDF5_INCLUDE_DIRS ${TMP_INC_DIR} PARENT_SCOPE)
+    set(HDF5_LIBRARIES ${TMP_LIB_1} ${TMP_LIB_2} PARENT_SCOPE)
+    set(HDF5_HL_LIBRARIES ${TMP_LIB_3} PARENT_SCOPE)
 
   else()
     execute_process(
@@ -122,24 +121,23 @@ function(build_hdf5 NAME EXT URL)
   endif()
 
   message("  <<build_hdf5>>")
-  message("  - HDF5_INCLUDE_DIRS = " ${NBLA_HDF5_DIR}/build.cmake/src)
-  message("  - HDF5_INCLUDE_DIRS = " ${NBLA_HDF5_DIR}/hl/src)
-  message("  - HDF5_INCLUDE_DIRS = " ${NBLA_HDF5_DIR}/src)
-  message("  - HDF5_LIBRARIES = " ${NBLA_HDF5_DIR}/build.cmake/bin/${CMAKE_BUILD_TYPE}/libhdf5${DEBUG_SUFFIX}.lib)
-  message("  - HDF5_LIBRARIES = " ${NBLA_HDF5_DIR}/build.cmake/bin/${CMAKE_BUILD_TYPE}/libhdf5_tools${DEBUG_SUFFIX}.lib)
-  message("  - HDF5_HL_LIBRARIES = " ${NBLA_HDF5_DIR}/build.cmake/bin/${CMAKE_BUILD_TYPE}/libhdf5_hl${DEBUG_SUFFIX}.lib)
+  message("  - HDF5_INCLUDE_DIRS = " ${TMP_INC_DIR})
+  message("  - HDF5_LIBRARIES = " ${TMP_LIB_1})
+  message("  - HDF5_LIBRARIES = " ${TMP_LIB_2})
+  message("  - HDF5_HL_LIBRARIES = " ${TMP_LIB_3})
 
 endfunction()
 
 
+# =============================================================================
 # protobuf
 function(build_protobuf NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
   set(NBLA_PROTOBUF_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   file(MAKE_DIRECTORY ${NBLA_PROTOBUF_DIR}/build.cmake)
   execute_process(
-    COMMAND cmake ../cmake
-            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
+    COMMAND cmake ..
+            # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
             -Dprotobuf_BUILD_TESTS=OFF
     WORKING_DIRECTORY ${NBLA_PROTOBUF_DIR}/build.cmake)
 
@@ -154,6 +152,7 @@ function(build_protobuf NAME EXT URL)
       COMMAND cmake --build .
       WORKING_DIRECTORY ${NBLA_PROTOBUF_DIR}/build.cmake)
 
+    find_program(SET_COMMAND protoc ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE})
     find_program(PROTOC_COMMAND protoc ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE} PARENT_SCOPE)
 
     set(PROTOBUF_INCLUDE_DIR ${NBLA_PROTOBUF_DIR}/src PARENT_SCOPE)
@@ -173,11 +172,12 @@ function(build_protobuf NAME EXT URL)
   message("  - PROTOBUF_INCLUDE_DIR = " ${NBLA_PROTOBUF_DIR}/src)
   message("  - PROTOBUF_LIBRARY = " ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/libprotobuf${DEBUG_SUFFIX}.lib)
   message("  - PROTOBUF_LIBRARY = " ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/libprotoc${DEBUG_SUFFIX}.lib)
-  message("  - PROTOC_COMMAND = " ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE})
+  message("  - PROTOC_COMMAND = " ${SET_COMMAND})
 
 endfunction()
 
 
+# =============================================================================
 # zlib
 function(build_zlib NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
@@ -185,7 +185,7 @@ function(build_zlib NAME EXT URL)
   file(MAKE_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
+            # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
     WORKING_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME}/build.cmake)
 
   if(WIN32)
@@ -199,7 +199,7 @@ function(build_zlib NAME EXT URL)
       COMMAND cmake --build .
       WORKING_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
 
-    set(ZLIB_INCLUDE_DIR ${NBLA_ZLIB_DIR} PARENT_SCOPE)
+    set(ZLIB_INCLUDE_DIRS ${NBLA_ZLIB_DIR} PARENT_SCOPE)
     if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
       set(ZLIB_LIBRARIES ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib PARENT_SCOPE)
     else()
@@ -209,23 +209,25 @@ function(build_zlib NAME EXT URL)
   endif()
 
   message("  <<build_zlib>>")
-  message("  - ZLIB_INCLUDE_DIR = " ${NBLA_ZLIB_DIR})
+  message("  - ZLIB_INCLUDE_DIRS = " ${NBLA_ZLIB_DIR})
   if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
     message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib)
   else()
-      message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib)
+    message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib)
   endif()
 
 endfunction()
 
 
+# =============================================================================
+# zstd
 function(build_zstd NAME EXT URL)
   download_and_extract_library(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip DIRECTORY)
   set(NBLA_ZSTD_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   file(MAKE_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ../build/cmake
-            -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
+            # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
     WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
 
   if(WIN32)

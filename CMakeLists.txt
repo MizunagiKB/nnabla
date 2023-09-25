@@ -35,12 +35,14 @@ option(BUILD_CPP_UTILS "Build C++ API and utilities" OFF)
 option(BUILD_PYTHON_PACKAGE "Build python package" ON)
 option(MAKE_MANYLINUX_WHEEL "Convert wheel to manylinux version" OFF)
 
+option(NBLA_CODE_GENERATE "NNabla codde generate" OFF)
 option(NBLA_BUILD_SHARED_LIBS "NNabla build shared Libraries" ON)
 
 option(NBLA_VERBOSE_MEMORY_USAGE "Enable debug print of memory usage" OFF)
 if(NBLA_VERBOSE_MEMORY_USAGE)
   add_definitions(-DNBLA_VERBOSE_MEMORY_USAGE)
 endif()
+
 
 ###############################################################################
 # Settings
@@ -84,7 +86,7 @@ build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.z
 # zstd
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
 # protobuf
-build_protobuf(protobuf-3.19.6 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.6.zip)
+build_protobuf(protobuf-21.5 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v21.5.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
 # hdf5
@@ -157,6 +159,8 @@ set(CPACK_PACKAGE_VERSION_PATCH ${version_patch})
 set(CPACK_PACKAGE_CONTACT "nnabla@googlegroups.com")
 
 
+if(${NBLA_CODE_GENERATE} STREQUAL ON)
+
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/src/nbla/proto)
 execute_process(
   COMMAND
@@ -199,6 +203,7 @@ execute_process(
   endif ()
 endif()
 
+endif() # NNABLA_CODE_GENERATE
 
 ###############################################################################
 # C++ Library
