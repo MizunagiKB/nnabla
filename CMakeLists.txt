@@ -57,8 +57,6 @@ if(${NBLA_BUILD_SHARED_LIBS} STREQUAL OFF)
   add_definitions(-Dnnabla_EXPORTS)
   add_definitions(-Dnnabla_utils_EXPORTS)
   add_definitions(-Dnnabla_cli_EXPORTS)
-  # set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
-  # set(CMAKE_CXX_FLAGS_RELEASE "/MD")
 endif()
 
 # 
@@ -159,8 +157,6 @@ set(CPACK_PACKAGE_VERSION_PATCH ${version_patch})
 set(CPACK_PACKAGE_CONTACT "nnabla@googlegroups.com")
 
 
-if(SKIP)
-
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/src/nbla/proto)
 execute_process(
   COMMAND
@@ -203,7 +199,6 @@ execute_process(
   endif ()
 endif()
 
-endif() # SKIP
 
 ###############################################################################
 # C++ Library

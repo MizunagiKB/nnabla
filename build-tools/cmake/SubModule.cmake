@@ -223,18 +223,8 @@ function(build_zstd NAME EXT URL)
   download_and_extract_library(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip DIRECTORY)
   set(NBLA_ZSTD_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   file(MAKE_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
-  if(NBLA_BUILD_SHARED_LIBS)
-    set(ZSTD_BUILD_SHARED "ON")
-    set(ZSTD_BUILD_STATIC "OFF")
-  else()
-    set(ZSTD_BUILD_SHARED "OFF")
-    set(ZSTD_BUILD_STATIC "ON")
-  endif()
   execute_process(
     COMMAND cmake ../build/cmake
-            -DZSTD_PROGRAMS_LINK_SHARED=${NBLA_BUILD_SHARED_LIBS}
-            -DZSTD_BUILD_SHARED=${ZSTD_BUILD_SHARED}
-            -DZSTD_BUILD_STATIC=${ZSTD_BUILD_STATIC}
     WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
 
   if(WIN32)
