@@ -35,7 +35,7 @@ option(BUILD_CPP_UTILS "Build C++ API and utilities" OFF)
 option(BUILD_PYTHON_PACKAGE "Build python package" ON)
 option(MAKE_MANYLINUX_WHEEL "Convert wheel to manylinux version" OFF)
 
-option(NBLA_CODE_GENERATE "NNabla codde generate" OFF)
+option(NBLA_CODE_GENERATE "NNabla codde generate" ON)
 option(NBLA_BUILD_SHARED_LIBS "NNabla build shared Libraries" ON)
 
 option(NBLA_VERBOSE_MEMORY_USAGE "Enable debug print of memory usage" OFF)
