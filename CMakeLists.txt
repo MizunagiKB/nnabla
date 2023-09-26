@@ -83,12 +83,14 @@ set(PYTHON_COMMAND "${PP}")
 
 # zlib
 build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip)
+
 # zstd
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
 # protobuf
 build_protobuf(protobuf-21.5 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v21.5.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
+error_abort()
 # hdf5
 build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 

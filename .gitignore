@@ -112,6 +112,7 @@
 /python/src/nnabla/libnnabla.so
 
 /build.cmake/
+/third_party/inst_*
 /third_party/hdf5*
 /third_party/libarchive*
 /third_party/protobuf*

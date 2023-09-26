@@ -10,6 +10,7 @@ function(build_libarchive NAME EXT URL)
   file(MAKE_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
+            -DZLIB_ROOT=${ZLIB_ROOT}
             # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
             -DENABLE_MBEDTLS=OFF
             -DENABLE_NETTLE=OFF
@@ -38,8 +39,6 @@ function(build_libarchive NAME EXT URL)
             -DENABLE_ICONV=OFF
             -DENABLE_TEST=OFF
             -DENABLE_COVERAGE=OFF
-            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-            -DZSTD_INCLUDE_DIR=${ZSTD_INCLUDE_DIR}
     WORKING_DIRECTORY ${NBLA_LIBARCHIVE_DIR}/build.cmake)
 
   if(WIN32)
@@ -181,12 +180,13 @@ endfunction()
 # zlib
 function(build_zlib NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
-  set(NBLA_ZLIB_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
+  set(TMP_BASE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
+  set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
   file(MAKE_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
-    WORKING_DIRECTORY ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME}/build.cmake)
+            -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
+    WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   if(WIN32)
     if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
@@ -196,24 +196,33 @@ function(build_zlib NAME EXT URL)
     endif()
 
     execute_process(
-      COMMAND cmake --build .
-      WORKING_DIRECTORY ${NBLA_ZLIB_DIR}/build.cmake)
+      COMMAND cmake --build . --config Release
+      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
+    execute_process(
+      COMMAND cmake --install .
+      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    set(ZLIB_INCLUDE_DIRS ${NBLA_ZLIB_DIR} PARENT_SCOPE)
-    if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
-      set(ZLIB_LIBRARIES ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib PARENT_SCOPE)
-    else()
-      set(ZLIB_LIBRARIES ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib PARENT_SCOPE)
-    endif()
+    set(TMP_INC_DIR ${TMP_BASE_DIR})
+    set(TMP_LIB_1 ${TMP_BASE_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib)
+    set(TMP_LIB_STATIC_1 ${TMP_BASE_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib)
+
+    set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
+    #set(ZLIB_INCLUDE_DIRS ${TMP_INC_DIR} PARENT_SCOPE)
+    #if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
+    #  set(ZLIB_LIBRARIES ${TMP_LIB_1} PARENT_SCOPE)
+    #else()
+    #  set(ZLIB_LIBRARIES ${TMP_LIB_STATIC_1} PARENT_SCOPE)
+    #endif()
+
   else()
   endif()
 
   message("  <<build_zlib>>")
-  message("  - ZLIB_INCLUDE_DIRS = " ${NBLA_ZLIB_DIR})
+  message("  - ZLIB_INCLUDE_DIRS = " ${TMP_INC_DIR})
   if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
-    message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlib${DEBUG_SUFFIX}.lib)
+    message("  - ZLIB_LIBRARIES = " ${TMP_LIB_1})
   else()
-    message("  - ZLIB_LIBRARIES = " ${NBLA_ZLIB_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/zlibstatic${DEBUG_SUFFIX}.lib)
+    message("  - ZLIB_LIBRARIES = " ${TMP_LIB_STATIC_1})
   endif()
 
 endfunction()
@@ -223,12 +232,14 @@ endfunction()
 # zstd
 function(build_zstd NAME EXT URL)
   download_and_extract_library(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip DIRECTORY)
-  set(NBLA_ZSTD_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
-  file(MAKE_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
+  set(TMP_BASE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
+  set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
+  file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ../build/cmake
+            -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
             # -DBUILD_SHARED_LIBS=${NBLA_BUILD_SHARED_LIBS}
-    WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
+    WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   if(WIN32)
     if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
@@ -238,29 +249,37 @@ function(build_zstd NAME EXT URL)
     endif()
 
     execute_process(
-      COMMAND cmake --build .
-      WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
+      COMMAND cmake --build . --config Release
+      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    set(ZSTD_INCLUDE_DIR ${NBLA_ZSTD_DIR}/lib PARENT_SCOPE)
+    execute_process(
+      COMMAND cmake --install .
+      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
+
+    set(TMP_INC_DIR ${TMP_BASE_DIR}/lib)
+    set(TMP_LIB_1 ${TMP_BASE_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib)
+    set(TMP_LIB_STATIC_1 ${TMP_BASE_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd_static.lib)
+    
+    set(ZSTD_INCLUDE_DIR ${TMP_INC_DIR} PARENT_SCOPE)
 
     if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
-      set(ZSTD_LIBRARY ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib PARENT_SCOPE)
+      set(ZSTD_LIBRARY ${TMP_LIB_1} PARENT_SCOPE)
     else()
-      set(ZSTD_LIBRARY ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd_static.lib PARENT_SCOPE)
+      set(ZSTD_LIBRARY ${TMP_LIB_STATIC_1} PARENT_SCOPE)
     endif()
 
   else()
     execute_process(
       COMMAND make
-      WORKING_DIRECTORY ${NBLA_ZSTD_DIR}/build.cmake)
+      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   endif()
 
   message("  <<build_zstd>>")
-  message("  - ZSTD_INCLUDE_DIR = " ${NBLA_ZSTD_DIR}/lib)
+  message("  - ZSTD_INCLUDE_DIR = " ${TMP_INC_DIR})
   if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
-    message("  - ZSTD_LIBRARY = " ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd.lib)
+    message("  - ZSTD_LIBRARY = " ${TMP_LIB_1})
   else()
-    message("  - ZSTD_LIBRARY = " ${NBLA_ZSTD_DIR}/build.cmake/lib/${CMAKE_BUILD_TYPE}/zstd_static.lib)
+    message("  - ZSTD_LIBRARY = " ${TMP_LIB_STATIC_1})
   endif()
 
 endfunction()
