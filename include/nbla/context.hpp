@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /** Context
-*/
+ */
 #ifndef __NBLA_CONTEXT_HPP__
 #define __NBLA_CONTEXT_HPP__
 
@@ -21,49 +21,52 @@
 #include <string>
 #include <vector>
 
-namespace nbla {
+namespace nbla
+{
 
-/** Context structure
+  /** Context structure
 
-It will be used specifying device and array class etc.
-\ingroup NNablaCoreGrp
-*/
-class Context {
-public:
-  /** A compute backend descriptor passed to Function/Solver or NdArray class.
+  It will be used specifying device and array class etc.
+  \ingroup NNablaCoreGrp
+  */
+  class NBLA_API Context
+  {
+  public:
+    /** A compute backend descriptor passed to Function/Solver or NdArray class.
 
-     @param[in] backend A vector of backend description. A specific
-     implementation of Function/Solver will be queried by each description, the
-     first matched one is used. For each element, it describes the backend of
-     computation and the data type config in a format of `<backend>:<data type
-     config>`. If only `backend` is given (`:<data type configuration>` is
-     omitted), the default data type config (`:float`)is automatically added.
-     @param[in] array_class Optional: A string expression of a preferred array
-     class. Even if it is not specified an array class is chosen according to
-     the default array class of an implementation of Function/Solver. Every
-     Function/Solver class has a list of array classes that can be used as
-     storage of the computation inputs and outputs. If the given array_class
-     doesn't match any of them, the default array class of the implementation
-     will be used.
-     @param[in] device_id A string expression of device ID of the backend.
+       @param[in] backend A vector of backend description. A specific
+       implementation of Function/Solver will be queried by each description, the
+       first matched one is used. For each element, it describes the backend of
+       computation and the data type config in a format of `<backend>:<data type
+       config>`. If only `backend` is given (`:<data type configuration>` is
+       omitted), the default data type config (`:float`)is automatically added.
+       @param[in] array_class Optional: A string expression of a preferred array
+       class. Even if it is not specified an array class is chosen according to
+       the default array class of an implementation of Function/Solver. Every
+       Function/Solver class has a list of array classes that can be used as
+       storage of the computation inputs and outputs. If the given array_class
+       doesn't match any of them, the default array class of the implementation
+       will be used.
+       @param[in] device_id A string expression of device ID of the backend.
+     */
+    Context(const vector<string> &backend = {"cpu:float"},
+            const string &array_class = "CpuArray",
+            const string &device_id = "0");
+    vector<string> backend;
+    string array_class;
+    string device_id;
+    Context &set_backend(const vector<string> &backend);
+    Context &set_array_class(const string &array_class);
+    Context &set_device_id(const string &device_id);
+    string to_string() const;
+  };
+
+  /**
    */
-  explicit NBLA_API Context(const vector<string> &backend = {"cpu:float"},
-                            const string &array_class = "CpuArray",
-                            const string &device_id = "0");
-  vector<string> backend;
-  string array_class;
-  string device_id;
-  Context NBLA_API &set_backend(const vector<string> &backend);
-  Context NBLA_API &set_array_class(const string &array_class);
-  Context NBLA_API &set_device_id(const string &device_id);
-  string to_string() const;
-};
-
-/**
-*/
-inline string get_array_key_from_context(const Context &ctx) {
-  return ctx.device_id + ":" + ctx.array_class;
-}
+  inline string get_array_key_from_context(const Context &ctx)
+  {
+    return ctx.device_id + ":" + ctx.array_class;
+  }
 }
 
 #endif
