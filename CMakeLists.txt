@@ -55,11 +55,6 @@ if (NOT CMAKE_BUILD_TYPE)
     FORCE)
 endif()
 
-if(${NBLA_BUILD_SHARED_LIBS} STREQUAL OFF)
-  add_definitions(-Dnnabla_EXPORTS)
-  add_definitions(-Dnnabla_utils_EXPORTS)
-  add_definitions(-Dnnabla_cli_EXPORTS)
-endif()
 
 # 
 if (NOT PYTHON_COMMAND_NAME)
