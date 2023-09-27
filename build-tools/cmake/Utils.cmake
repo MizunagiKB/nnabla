@@ -45,20 +45,21 @@ function(prepend lib_paths prefix)
   set (${lib_paths} "${listvar}" PARENT_SCOPE)
 endfunction(prepend)
 
-function(findhdf5)
-  if (WIN32)
-    set(build_type_hdf5 "${CMAKE_BUILD_TYPE}")
-  else()
-    set(build_type_hdf5 "")
-  endif()
-  set(HDF5_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party/hdf5-master/src
-     ${PROJECT_SOURCE_DIR}/third_party/hdf5-master/hl/src
-     ${CMAKE_BINARY_DIR}/third_party/hdf5-master
-     ${CMAKE_BINARY_DIR}/third_party/hdf5-master/src)
-  prepend(HDF5_LIBRARIES ${CMAKE_BINARY_DIR}/third_party/hdf5-master/bin/${build_type_hdf5} "hdf5" "hdf5_hl")
-  set(HDF5_INCLUDE_DIRS "${HDF5_INCLUDE_DIRS}" PARENT_SCOPE)
-  set(HDF5_LIBRARIES "${HDF5_LIBRARIES}" PARENT_SCOPE)
-endfunction(findhdf5)
+
+#function(findhdf5)
+#  if (WIN32)
+#    set(build_type_hdf5 "${CMAKE_BUILD_TYPE}")
+#  else()
+#    set(build_type_hdf5 "")
+#  endif()
+#  set(HDF5_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/third_party/hdf5-master/src
+#     ${PROJECT_SOURCE_DIR}/third_party/hdf5-master/hl/src
+#     ${CMAKE_BINARY_DIR}/third_party/hdf5-master
+#     ${CMAKE_BINARY_DIR}/third_party/hdf5-master/src)
+#  prepend(HDF5_LIBRARIES ${CMAKE_BINARY_DIR}/third_party/hdf5-master/bin/${build_type_hdf5} "hdf5" "hdf5_hl")
+#  set(HDF5_INCLUDE_DIRS "${HDF5_INCLUDE_DIRS}" PARENT_SCOPE)
+#  set(HDF5_LIBRARIES "${HDF5_LIBRARIES}" PARENT_SCOPE)
+#endfunction(findhdf5)
 
 ################################################################################################
 # Clears variables from list

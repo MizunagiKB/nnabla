@@ -35,7 +35,7 @@ option(BUILD_CPP_UTILS "Build C++ API and utilities" OFF)
 option(BUILD_PYTHON_PACKAGE "Build python package" ON)
 option(MAKE_MANYLINUX_WHEEL "Convert wheel to manylinux version" OFF)
 
-option(NBLA_CODE_GENERATE "NNabla codde generate" ON)
+option(NBLA_CODE_GENERATE "NNabla codde generate" OFF)
 option(NBLA_BUILD_SHARED_LIBS "NNabla build shared Libraries" ON)
 
 option(NBLA_VERBOSE_MEMORY_USAGE "Enable debug print of memory usage" OFF)
@@ -81,19 +81,30 @@ endif()
 set(PYTHON_COMMAND "${PP}")
 
 
-# zlib
+# bz2(*master)
+build_bz2(bzip2-master .zip https://github.com/libarchive/bzip2/archive/refs/heads/master.zip)
+# lz4
+build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
+# zlib: set ZLIB_ROOT
 build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip)
-
-# zstd
+# zstd: set PC_ZSTD_INCLUDEDIR, PC_ZSTD_LIBDIR
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
-# protobuf
+# protobuf: set PROTOC_COMMAND
 build_protobuf(protobuf-21.5 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v21.5.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
-error_abort()
-# hdf5
+# hdf5: set HDF5_ROOT
 build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 
+add_definitions(-DPROTOBUF_USE_DLLS)
+
+Find_Package(HDF5 COMPONENTS C HL)
+
+#message("HDF5_FOUND = " ${HDF5_FOUND})
+#message("HDF5_INCLUDE_DIRS = " ${HDF5_INCLUDE_DIRS})
+#message("HDF5_LIBRARIES = " ${HDF5_LIBRARIES})
+#message("HDF5_HL_LIBRARIES = " ${HDF5_HL_LIBRARIES})
+#error()
 
 if(NOT EXISTS ${PROTOC_COMMAND})
   # If find_program fails.
@@ -271,7 +282,7 @@ if(BUILD_CPP_LIB)
   if(BUILD_CPP_UTILS)
     add_subdirectory(src/nbla_utils)
     add_subdirectory(src/nbla_cli)
-    # add_subdirectory(examples/cpp) // 
+    add_subdirectory(examples/cpp) 
   endif()
 
   ###############################################################################

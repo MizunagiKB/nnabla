@@ -15,11 +15,11 @@
 
 set(LIB_NAME nnabla_utils${LIB_NAME_SUFFIX})
 
-if (NBLA_BUILD_SHARED_LIBS)
+#if (NBLA_BUILD_SHARED_LIBS)
   set(nbla_utils_SHARED_OR_STATIC "SHARED")
-else ()
-  set(nbla_utils_SHARED_OR_STATIC "STATIC")
-endif()
+#else ()
+#  set(nbla_utils_SHARED_OR_STATIC "STATIC")
+#endif()
 
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 
@@ -45,7 +45,6 @@ list(APPEND nbla_utils_SOURCES
   nnp_impl_configs.cpp
   nnp_network_expander.cpp
   parameters.cpp
-  dummy.cc
 )
 
 if (UNIX)
@@ -83,9 +82,9 @@ add_library(${LIB_NAME} ${nbla_utils_SHARED_OR_STATIC}
 )
 
 if (WIN32)
-  # find_package(LibArchive REQUIRED)
-  # find_package(ZLIB REQUIRED)
-  # find_package(Protobuf REQUIRED)
+  find_package(LibArchive REQUIRED)
+  find_package(ZLIB REQUIRED)
+  find_package(Protobuf REQUIRED)
   include_directories(
     ${LibArchive_INCLUDE_DIR}
     ${PROTOBUF_INCLUDE_DIR}
@@ -102,12 +101,14 @@ if (WIN32)
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
+    Find_Package(HDF5 COMPONENTS C HL)
     # findhdf5()
     include_directories(
       ${HDF5_INCLUDE_DIRS}
     )
     target_link_libraries(${LIB_NAME}
       ${HDF5_LIBRARIES}
+      ${HDF5_HL_LIBRARIES}
     )
     add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB)
   endif()
@@ -139,6 +140,7 @@ else()
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
+    Find_Package(HDF5 COMPONENTS C HL)
     # findhdf5()
   endif()
 

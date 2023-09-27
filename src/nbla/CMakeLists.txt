@@ -15,11 +15,11 @@
 
 set(LIB_NAME nnabla${LIB_NAME_SUFFIX})
 
-if(NBLA_BUILD_SHARED_LIBS)
+#if(NBLA_BUILD_SHARED_LIBS)
   set(nbla_SHARED_OR_STATIC "SHARED")
-else ()
-  set(nbla_SHARED_OR_STATIC "STATIC")
-endif()
+#else ()
+#  set(nbla_SHARED_OR_STATIC "STATIC")
+#endif()
 
 file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   ./*.cpp

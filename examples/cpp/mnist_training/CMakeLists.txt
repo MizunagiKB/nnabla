@@ -14,10 +14,7 @@
 # limitations under the License.
 
 add_executable(mnist_training main.cpp)
-if(WIN32)
-else()
-  find_package(ZLIB REQUIRED)
-endif()
+find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIRS})
 target_link_libraries(mnist_training ${NBLA_LIBRARY_NAME} ${NBLA_UTILS_LIBRARY_NAME} ${ZLIB_LIBRARIES})
 set_property(TARGET mnist_training PROPERTY CXX_STANDARD 14)

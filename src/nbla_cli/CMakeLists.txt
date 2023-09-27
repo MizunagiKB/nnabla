@@ -15,11 +15,11 @@
 
 set(LIB_NAME nnabla_cli${LIB_NAME_SUFFIX})
 
-if (NBLA_BUILD_SHARED_LIBS)
+#if (NBLA_BUILD_SHARED_LIBS)
   set(nbla_cli_SHARED_OR_STATIC "SHARED")
-else ()
-  set(nbla_cli_SHARED_OR_STATIC "STATIC")
-endif()
+#else ()
+#  set(nbla_cli_SHARED_OR_STATIC "STATIC")
+#endif()
 
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 if (WIN32)
