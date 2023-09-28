@@ -82,13 +82,23 @@ function(build_hdf5 NAME EXT URL)
 
   execute_process(
     COMMAND cmake ..
-            -DBUILD_SHARED_LIBS=ON
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
-            -DHDF5_BUILD_HL_LIB=ON
-            -DHDF5_EXPORTED_TARGETS=nbla_utils-hdf5-targets
-            -DHDF5_EXTERNALLY_CONFIGURED=1
+            -DBUILD_STATIC_LIBS=OFF
+            -DONLY_SHARED_LIBS=ON
+            -DBUILD_SHARED_LIBS=ON
+            -DCPACK_SOURCE_ZIP=OFF
+            -DHDF5_BUILD_HL_TOOLS=OFF
+            -DHDF5_BUILD_TOOLS=OFF
+            -DHDF5_BUILD_UTILS=OFF
             -DHDF5_BUILD_EXAMPLES=OFF
-            -DBUILD_TESTING=OFF
+            #-DHDF5_TEST_CPP=OFF
+            #-DHDF5_TEST_EXAMPLES=OFF
+            #-DHDF5_TEST_JAVA=OFF
+            #-DHDF5_TEST_TOOLS=OFF
+            #-DHDF5_TEST_VFD=OFF
+            #-DHDF5_TEST_SWMR=OFF
+            #-DHDF5_TEST_PARALLEL=OFF
+            -DHDF5_BUILD_HL_LIB=ON
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   if(WIN32)
@@ -130,8 +140,9 @@ function(build_protobuf NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -Dprotobuf_BUILD_SHARED_LIBS=ON
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
+            -Dprotobuf_BUILD_SHARED_LIBS=ON
+            -Dprotobuf_MSVC_STATIC_RUNTIME=OFF
             -Dprotobuf_BUILD_TESTS=OFF
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 

@@ -77,7 +77,7 @@ set(PYTHON_COMMAND "${PP}")
 
 
 # bzip2(*master)
-build_bzip2(bzip2-master .zip https://github.com/libarchive/bzip2/archive/refs/heads/master.zip)
+#build_bzip2(bzip2-master .zip https://github.com/libarchive/bzip2/archive/refs/heads/master.zip)
 # lz4
 build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
 # zlib: set ZLIB_ROOT
@@ -93,7 +93,9 @@ build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/t
 
 
 add_definitions(-DPROTOBUF_USE_DLLS)
-
+if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+  add_definitions(-DCMAKE_CXX_FLAGS="/bigobj")
+endif()
 
 if(NOT EXISTS ${PROTOC_COMMAND})
   # If find_program fails.
