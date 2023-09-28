@@ -136,12 +136,6 @@ function(build_protobuf NAME EXT URL)
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   if(WIN32)
-    if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
-      set(DEBUG_SUFFIX "d")
-    else()
-      set(DEBUG_SUFFIX "")
-    endif()
-
     execute_process(
       COMMAND cmake --build . --config Release
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
@@ -265,8 +259,6 @@ function(build_zlib NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    # set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
-
   else()
   endif()
 
@@ -286,7 +278,7 @@ endfunction()
 # =============================================================================
 # zstd
 function(build_zstd NAME EXT URL)
-  download_and_extract_library(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip DIRECTORY)
+  download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
   set(TMP_BASE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
