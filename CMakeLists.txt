@@ -48,10 +48,6 @@ endif()
 ###############################################################################
 set(NBLA_ROOT_CMAKE_DIR ${CMAKE_SOURCE_DIR})
 
-set(CMAKE_C_FLAGS_RELEASE /MT)
-set(CMAKE_C_FLAGS_DEBUG /MTd)
-set(CMAKE_CXX_FLAGS_RELEASE /MT)
-set(CMAKE_CXX_FLAGS_DEBUG /MTd)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING

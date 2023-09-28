@@ -11,10 +11,7 @@ function(build_libarchive NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
+            -DBUILD_SHARED_LIBS=ON
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
             -DZLIB_ROOT=${ZLIB_ROOT}
             -DPC_ZSTD_INCLUDEDIR=${PC_ZSTD_INCLUDEDIR}
@@ -85,10 +82,6 @@ function(build_hdf5 NAME EXT URL)
 
   execute_process(
     COMMAND cmake ..
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
             -DBUILD_SHARED_LIBS=ON
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
             -DHDF5_BUILD_HL_LIB=ON
@@ -137,10 +130,6 @@ function(build_protobuf NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
             -Dprotobuf_BUILD_SHARED_LIBS=ON
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
             -Dprotobuf_BUILD_TESTS=OFF
@@ -187,10 +176,6 @@ function(build_bzip2 NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
@@ -227,10 +212,6 @@ function(build_lz4 NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ../build/cmake
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
@@ -267,10 +248,6 @@ function(build_zlib NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
@@ -285,7 +262,9 @@ function(build_zlib NAME EXT URL)
   else()
   endif()
 
+  set(ZLIB_ROOT ${TMP_INST_DIR})
   Find_Package(ZLIB REQUIRED)
+  set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
 
   if(NOT ZLIB_FOUND)
     error_abort()
@@ -307,10 +286,6 @@ function(build_zstd NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ../build/cmake
-            -DCMAKE_C_FLAGS_RELEASE="/MT"
-            -DCMAKE_C_FLAGS_DEBUG="/MTd"
-            -DCMAKE_CXX_FLAGS_RELEASE="/MT"
-            -DCMAKE_CXX_FLAGS_DEBUG="/MTd"
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
