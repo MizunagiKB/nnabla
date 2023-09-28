@@ -53,20 +53,21 @@ function(build_libarchive NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   
-    #set(TMP_INC_DIR ${TMP_INST_DIR}/libarchive)
-    #set(TMP_LIB ${TMP_INST_DIR}/build.cmake/libarchive/${CMAKE_BUILD_TYPE}/archive.lib)
-    #set(LibArchive_INCLUDE_DIR ${TMP_INC_DIR} PARENT_SCOPE)
-    #set(LibArchive_LIBRARIES ${TMP_LIB} PARENT_SCOPE)
-
   else()
     execute_process(
       COMMAND make
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   endif()
 
-  message("  <<build_libarchive>>")
-  #message("  - LibArchive_INCLUDE_DIR = " ${TMP_INC_DIR})
-  #message("  - LibArchive_LIBRARIES = " ${TMP_LIB})
+  Find_Package(LibArchive)
+
+  if(NOT LibArchive_FOUND)
+    error_abort()
+  else()
+    message("  <<build_libarchive>>")
+    message("  LibArchive_INCLUDE_DIR = " ${LibArchive_INCLUDE_DIR})
+    message("    LibArchive_LIBRARIES = " ${LibArchive_LIBRARIES})
+  endif()
 
 endfunction()
 
@@ -91,12 +92,6 @@ function(build_hdf5 NAME EXT URL)
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   if(WIN32)
-    #if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
-    #  set(DEBUG_SUFFIX "_D")
-    #else()
-    #  set(DEBUG_SUFFIX "")
-    #endif()
-
     execute_process(
       COMMAND cmake --build . --config=Release
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
@@ -104,17 +99,7 @@ function(build_hdf5 NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   
-    set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
-    #set(NBLA_HDF5_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/HDF5-1.14.3.3b5b26b-win64)
-
-    #set(TMP_INC_DIR ${NBLA_HDF5_DIR}/include)
-    #set(TMP_LIB_1 ${NBLA_HDF5_DIR}/lib/hdf5.lib)
-    #set(TMP_LIB_2 ${NBLA_HDF5_DIR}/lib/hdf5_hl.lib)
-    #set(TMP_LIB_3 "")
-
-    #set(HDF5_INCLUDE_DIRS ${TMP_INC_DIR} PARENT_SCOPE)
-    #set(HDF5_LIBRARIES ${TMP_LIB_1} ${TMP_LIB_2} PARENT_SCOPE)
-    #set(HDF5_HL_LIBRARIES ${TMP_LIB_3} PARENT_SCOPE)
+    # set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
 
   else()
     execute_process(
@@ -122,11 +107,16 @@ function(build_hdf5 NAME EXT URL)
       WORKING_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
   endif()
 
-  message("  <<build_hdf5>>")
-  message("  - HDF5_ROOT = " ${TMP_INST_DIR})
-  #message("  - HDF5_LIBRARIES = " ${TMP_LIB_1})
-  #message("  - HDF5_LIBRARIES = " ${TMP_LIB_2})
-  #message("  - HDF5_HL_LIBRARIES = " ${TMP_LIB_3})
+  Find_Package(HDF5 COMPONENTS C HL REQUIRED)
+
+  if(NOT HDF5_FOUND)
+    error_abort()
+  else()
+    message("  <<build_hdf5>>")
+    message("  HDF5_INCLUDE_DIR = " ${HDF5_INCLUDE_DIR})
+    message("    HDF5_LIBRARIES = " ${HDF5_LIBRARIES})
+    message(" HDF5_HL_LIBRARIES = " ${HDF5_HL_LIBRARIES})
+  endif()
 
 endfunction()
 
@@ -159,17 +149,8 @@ function(build_protobuf NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    # Protobuf_SRC_ROOT_FOLDER
-
-    #find_program(SET_COMMAND protoc ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE})
     find_program(TMP_COMMAND protoc ${TMP_INST_DIR}/bin)
     set(PROTOC_COMMAND ${TMP_COMMAND} PARENT_SCOPE)
-
-    #set(PROTOBUF_INCLUDE_DIR ${NBLA_PROTOBUF_DIR}/src PARENT_SCOPE)
-    #set(
-    #  PROTOBUF_LIBRARY ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/libprotobuf${DEBUG_SUFFIX}.lib
-    #                   ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/libprotoc${DEBUG_SUFFIX}.lib
-    #  PARENT_SCOPE)
 
   else()
     execute_process(
@@ -178,18 +159,23 @@ function(build_protobuf NAME EXT URL)
     find_program(PROTOC_COMMAND protoc ${NBLA_PROTOBUF_DIR}/build.cmake PARENT_SCOPE)
   endif()
 
-  message("  <<build_protobuf>>")
-  #message("  - PROTOBUF_INCLUDE_DIR = " ${NBLA_PROTOBUF_DIR}/src)
-  #message("  - PROTOBUF_LIBRARY = " ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/libprotobuf${DEBUG_SUFFIX}.lib)
-  #message("  - PROTOBUF_LIBRARY = " ${NBLA_PROTOBUF_DIR}/build.cmake/${CMAKE_BUILD_TYPE}/libprotoc${DEBUG_SUFFIX}.lib)
-  message("  - PROTOC_COMMAND = " ${TMP_COMMAND})
+  Find_Package(Protobuf REQUIRED)
+
+  if(NOT Protobuf_FOUND)
+    error_abort()
+  else()
+    message("  <<build_protobuf>>")
+    message("  PROTOBUF_INCLUDE_DIR = " ${PROTOBUF_INCLUDE_DIR})
+    message("      PROTOBUF_LIBRARY = " ${PROTOBUF_LIBRARY})
+    message("        PROTOC_COMMAND = " ${TMP_COMMAND})
+  endif()
 
 endfunction()
 
 
 # =============================================================================
-# bz4
-function(build_bz2 NAME EXT URL)
+# bzip2
+function(build_bzip2 NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
   set(TMP_BASE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
@@ -207,19 +193,18 @@ function(build_bz2 NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    #set(TMP_INC_DIR ${TMP_INST_DIR}/include)
-    #set(TMP_LIB_1 ${TMP_INST_DIR}/lib/zlib${DEBUG_SUFFIX}.lib)
-    #set(TMP_LIB_STATIC_1 ${TMP_INST_DIR}/lib/zlibstatic${DEBUG_SUFFIX}.lib)
-
-    set(_BZIP2_PATHS ${TMP_INST_DIR} PARENT_SCOPE)
-
   else()
   endif()
 
-  message("  <<build_BZip2>>")
-  message("  - _BZIP2_PATHS = " ${TMP_INST_DIR})
-  #message("  - TMP_LIB_1 = " ${TMP_LIB_1})
-  #message("  - TMP_LIB_STATIC_1 = " ${TMP_LIB_STATIC_1})
+  Find_Package(BZip2 REQUIRED)
+
+  if(NOT BZip2_FOUND)
+    error_abort()
+  else()
+    message("  <<build_bzip2>>")
+    message("  BZIP2_INCLUDE_DIR = " ${BZIP2_INCLUDE_DIR})
+    message("      BZIP2_LIBRARY = " ${BZIP2_LIBRARY})
+  endif()
 
 endfunction()
 
@@ -244,19 +229,18 @@ function(build_lz4 NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    #set(TMP_INC_DIR ${TMP_INST_DIR}/include)
-    #set(TMP_LIB_1 ${TMP_INST_DIR}/lib/zlib${DEBUG_SUFFIX}.lib)
-    #set(TMP_LIB_STATIC_1 ${TMP_INST_DIR}/lib/zlibstatic${DEBUG_SUFFIX}.lib)
-
-    #set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
-
   else()
   endif()
 
-  #message("  <<build_zlib>>")
-  #message("  - ZLIB_INCLUDE_DIRS = " ${TMP_INC_DIR})
-  #message("  - TMP_LIB_1 = " ${TMP_LIB_1})
-  #message("  - TMP_LIB_STATIC_1 = " ${TMP_LIB_STATIC_1})
+  Find_Package(LZ4 REQUIRED)
+
+  if(NOT LZ4_FOUND)
+    error_abort()
+  else()
+    message("  <<build_lz4>>")
+    message("  LZ4_INCLUDE_DIR = " ${LZ4_INCLUDE_DIR})
+    message("      LZ4_LIBRARY = " ${LZ4_LIBRARY})
+  endif()
 
 endfunction()
 
@@ -281,13 +265,20 @@ function(build_zlib NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-    set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
+    # set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
 
   else()
   endif()
 
-  message("  <<build_zlib>>")
-  message("  - ZLIB_ROOT = " ${TMP_INST_DIR})
+  Find_Package(ZLIB REQUIRED)
+
+  if(NOT ZLIB_FOUND)
+    error_abort()
+  else()
+    message("  <<build_zlib>>")
+    message("  ZLIB_INCLUDE_DIR = " ${ZLIB_INCLUDE_DIR})
+    message("      ZLIB_LIBRARY = " ${ZLIB_LIBRARY})
+  endif()
 
 endfunction()
 
@@ -313,17 +304,11 @@ function(build_zstd NAME EXT URL)
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
     set(TMP_INC_DIR ${TMP_BASE_DIR}/lib)
-    set(TMP_LIB_1 ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd.lib)
-    set(TMP_LIB_STATIC_1 ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd_static.lib)
+    set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd.lib)
+    #set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd_static.lib)
     
     set(PC_ZSTD_INCLUDEDIR ${TMP_INC_DIR} PARENT_SCOPE)
-    set(PC_ZSTD_LIBDIR ${TMP_LIB_1} PARENT_SCOPE)
-
-    #if(${NBLA_BUILD_SHARED_LIBS} STREQUAL ON)
-    #  set(PC_ZSTD_LIBDIR ${TMP_LIB_1} PARENT_SCOPE)
-    #else()
-    #  set(PC_ZSTD_LIBDIR ${TMP_LIB_STATIC_1} PARENT_SCOPE)
-    #endif()
+    set(PC_ZSTD_LIBDIR ${TMP_LIB} PARENT_SCOPE)
 
   else()
     execute_process(
@@ -331,8 +316,14 @@ function(build_zstd NAME EXT URL)
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   endif()
 
-  message("  <<build_zstd>>")
-  message("  - PC_ZSTD_INCLUDEDIR = " ${TMP_INC_DIR})
-  message("  - PC_ZSTD_LIBDIR = " ${TMP_LIB_1})
+  Find_Package(ZSTD REQUIRED)
+
+  if(NOT ZSTD_FOUND)
+    error_abort()
+  else()
+    message("  <<build_zstd>>")
+    message("  PC_ZSTD_INCLUDEDIR = " ${TMP_INC_DIR})
+    message("      PC_ZSTD_LIBDIR = " ${TMP_LIB})
+  endif()
 
 endfunction()

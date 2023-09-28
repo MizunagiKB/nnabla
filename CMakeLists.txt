@@ -35,7 +35,6 @@ option(BUILD_CPP_UTILS "Build C++ API and utilities" OFF)
 option(BUILD_PYTHON_PACKAGE "Build python package" ON)
 option(MAKE_MANYLINUX_WHEEL "Convert wheel to manylinux version" OFF)
 
-option(NBLA_CODE_GENERATE "NNabla codde generate" OFF)
 option(NBLA_BUILD_SHARED_LIBS "NNabla build shared Libraries" ON)
 
 option(NBLA_VERBOSE_MEMORY_USAGE "Enable debug print of memory usage" OFF)
@@ -76,8 +75,8 @@ endif()
 set(PYTHON_COMMAND "${PP}")
 
 
-# bz2(*master)
-build_bz2(bzip2-master .zip https://github.com/libarchive/bzip2/archive/refs/heads/master.zip)
+# bzip2(*master)
+build_bzip2(bzip2-master .zip https://github.com/libarchive/bzip2/archive/refs/heads/master.zip)
 # lz4
 build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
 # zlib: set ZLIB_ROOT
@@ -91,15 +90,9 @@ build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/
 # hdf5: set HDF5_ROOT
 build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 
+
 add_definitions(-DPROTOBUF_USE_DLLS)
 
-Find_Package(HDF5 COMPONENTS C HL)
-
-#message("HDF5_FOUND = " ${HDF5_FOUND})
-#message("HDF5_INCLUDE_DIRS = " ${HDF5_INCLUDE_DIRS})
-#message("HDF5_LIBRARIES = " ${HDF5_LIBRARIES})
-#message("HDF5_HL_LIBRARIES = " ${HDF5_HL_LIBRARIES})
-#error()
 
 if(NOT EXISTS ${PROTOC_COMMAND})
   # If find_program fails.
@@ -167,7 +160,7 @@ set(CPACK_PACKAGE_VERSION_PATCH ${version_patch})
 set(CPACK_PACKAGE_CONTACT "nnabla@googlegroups.com")
 
 
-if(${NBLA_CODE_GENERATE} STREQUAL ON)
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/NNABLA_CMakeSkip)
 
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/src/nbla/proto)
 execute_process(
@@ -211,7 +204,7 @@ execute_process(
   endif ()
 endif()
 
-endif() # NNABLA_CODE_GENERATE
+endif() # NOT EXISTS ${CMAKE_SOURCE_DIR}/NNABLA_CMakeSkip
 
 ###############################################################################
 # C++ Library
