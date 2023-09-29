@@ -96,7 +96,7 @@ build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.z
 # zstd: set PC_ZSTD_INCLUDEDIR, PC_ZSTD_LIBDIR
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
 # protobuf: set PROTOC_COMMAND
-build_protobuf(protobuf-3.21.1 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.20.1.zip)
+build_protobuf(protobuf-3.20.1 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.20.1.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
 # hdf5: set HDF5_ROOT

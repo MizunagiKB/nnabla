@@ -117,15 +117,15 @@ function(build_hdf5 NAME EXT URL)
       COMMAND cmake --install .
       WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   
-    # set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
-
   else()
     execute_process(
       COMMAND make
       WORKING_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
   endif()
 
+  set(HDF5_ROOT ${TMP_INST_DIR})
   Find_Package(HDF5 COMPONENTS C HL REQUIRED)
+  set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
 
   if(NOT HDF5_FOUND)
     error_abort()
@@ -147,7 +147,7 @@ function(build_protobuf NAME EXT URL)
   set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
-    COMMAND cmake ..
+    COMMAND cmake ../cmake
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
             -Dprotobuf_MSVC_STATIC_RUNTIME=ON
             -Dprotobuf_BUILD_TESTS=OFF
