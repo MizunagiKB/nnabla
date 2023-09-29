@@ -90,7 +90,7 @@ set(PYTHON_COMMAND "${PP}")
 build_eigen(eigen-3.3.5 .zip https://gitlab.com/libeigen/eigen/-/archive/3.3.5/eigen-3.3.5.zip)
 # lz4
 build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
-# zlib: set ZLIB_ROOT
+# zlib
 build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip)
 # zstd: set PC_ZSTD_INCLUDEDIR, PC_ZSTD_LIBDIR
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
@@ -98,7 +98,7 @@ build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1
 build_protobuf(protobuf-3.20.1 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.20.1.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
-# hdf5: set HDF5_ROOT
+# hdf5
 build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 
 
