@@ -34,21 +34,18 @@ option(BUILD_CPP_TEST "Build testing" OFF)
 option(BUILD_CPP_UTILS "Build C++ API and utilities" OFF)
 option(BUILD_PYTHON_PACKAGE "Build python package" ON)
 option(MAKE_MANYLINUX_WHEEL "Convert wheel to manylinux version" OFF)
-
-option(NBLA_BUILD_SHARED_LIBS "NNabla build shared Libraries" ON)
-
+option(NBLA_SHARED_LIBS "NNabla build shared Libraries" ON)
 option(NBLA_VERBOSE_MEMORY_USAGE "Enable debug print of memory usage" OFF)
 if(NBLA_VERBOSE_MEMORY_USAGE)
   add_definitions(-DNBLA_VERBOSE_MEMORY_USAGE)
 endif()
 
+set(NBLA_ROOT_CMAKE_DIR ${CMAKE_SOURCE_DIR})
+
 
 ###############################################################################
 # Settings
 ###############################################################################
-set(NBLA_ROOT_CMAKE_DIR ${CMAKE_SOURCE_DIR})
-
-
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING
     "Build type release is default on single-configuration build system like GNU make."
@@ -56,7 +53,21 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-# 
+if(MSVC)
+  if(CMAKE_BUILD_TYPE STREQUAL Release)
+    set(CMAKE_C_FLAGS_RELEASE /MT)
+    set(CMAKE_CXX_FLAGS_RELEASE /MT)
+  else()
+    set(CMAKE_C_FLAGS_DEBUG /MTd)
+    set(CMAKE_CXX_FLAGS_DEBUG /MTd)
+    add_compile_options(-DCMAKE_CXX_FLAGS="/bigobj")
+  endif()
+  if(NOT NBLA_SHARED_LIBS STREQUAL ON)
+    add_compile_options(-Dnnabla_static_lib)
+  endif()
+endif()
+
+
 if (NOT PYTHON_COMMAND_NAME)
   if(NOT PYTHON_VERSION_MAJOR)
     set(PYTHON_COMMAND_NAME "python3")
@@ -76,8 +87,8 @@ endif()
 set(PYTHON_COMMAND "${PP}")
 
 
-# bzip2(*master)
-#build_bzip2(bzip2-master .zip https://github.com/libarchive/bzip2/archive/refs/heads/master.zip)
+# eigen(download only)
+build_eigen(eigen-3.3.5 .zip https://gitlab.com/libeigen/eigen/-/archive/3.3.5/eigen-3.3.5.zip)
 # lz4
 build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
 # zlib: set ZLIB_ROOT
@@ -85,17 +96,23 @@ build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.z
 # zstd: set PC_ZSTD_INCLUDEDIR, PC_ZSTD_LIBDIR
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
 # protobuf: set PROTOC_COMMAND
-build_protobuf(protobuf-21.5 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v21.5.zip)
+build_protobuf(protobuf-3.21.1 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.20.1.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
 # hdf5: set HDF5_ROOT
 build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 
 
-add_definitions(-DPROTOBUF_USE_DLLS)
-if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
-  add_definitions(-DCMAKE_CXX_FLAGS="/bigobj")
-endif()
+#if(MSVC)
+#  add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>") # for Godot Engine
+#  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>") # for Godot Engine
+#  if(${NBLA_BUILD_SHARED_LIBS} STREQUAL OFF)
+#    add_compile_options(-Dnnabla_static_lib)
+#  endif()
+#  if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+#  endif()
+#endif()
+
 
 if(NOT EXISTS ${PROTOC_COMMAND})
   # If find_program fails.
@@ -208,6 +225,7 @@ execute_process(
 endif()
 
 endif() # NOT EXISTS ${CMAKE_SOURCE_DIR}/NNABLA_CMakeSkip
+
 
 ###############################################################################
 # C++ Library

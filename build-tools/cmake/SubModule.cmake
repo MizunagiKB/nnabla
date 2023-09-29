@@ -73,6 +73,14 @@ endfunction()
 
 
 # =============================================================================
+# eigen
+function(build_eigen NAME EXT URL)
+  download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
+  message("  <<build_eigen>>")
+endfunction()
+
+
+# =============================================================================
 # hdf5
 function(build_hdf5 NAME EXT URL)
   download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
@@ -141,8 +149,7 @@ function(build_protobuf NAME EXT URL)
   execute_process(
     COMMAND cmake ..
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
-            -Dprotobuf_BUILD_SHARED_LIBS=ON
-            -Dprotobuf_MSVC_STATIC_RUNTIME=OFF
+            -Dprotobuf_MSVC_STATIC_RUNTIME=ON
             -Dprotobuf_BUILD_TESTS=OFF
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 

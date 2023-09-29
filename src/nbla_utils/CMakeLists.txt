@@ -15,11 +15,11 @@
 
 set(LIB_NAME nnabla_utils${LIB_NAME_SUFFIX})
 
-#if (NBLA_BUILD_SHARED_LIBS)
-  set(nbla_utils_SHARED_OR_STATIC "SHARED")
-#else ()
-#  set(nbla_utils_SHARED_OR_STATIC "STATIC")
-#endif()
+if(NBLA_SHARED_LIBS STREQUAL ON)
+  set(nbla_utils_SHARED_OR_STATIC SHARED)
+else ()
+  set(nbla_utils_SHARED_OR_STATIC STATIC)
+endif()
 
 include(${CMAKE_SOURCE_DIR}/build-tools/cmake/Utils.cmake)
 
