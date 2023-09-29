@@ -123,9 +123,9 @@ function(build_hdf5 NAME EXT URL)
       WORKING_DIRECTORY ${NBLA_HDF5_DIR}/build.cmake)
   endif()
 
-  set(HDF5_ROOT ${TMP_INST_DIR})
+  #set(HDF5_ROOT ${TMP_INST_DIR})
   Find_Package(HDF5 COMPONENTS C HL REQUIRED)
-  set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
+  #set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
 
   if(NOT HDF5_FOUND)
     error_abort()
@@ -180,42 +180,6 @@ function(build_protobuf NAME EXT URL)
     message("  PROTOBUF_INCLUDE_DIR = " ${PROTOBUF_INCLUDE_DIR})
     message("      PROTOBUF_LIBRARY = " ${PROTOBUF_LIBRARY})
     message("        PROTOC_COMMAND = " ${TMP_COMMAND})
-  endif()
-
-endfunction()
-
-
-# =============================================================================
-# bzip2
-function(build_bzip2 NAME EXT URL)
-  download_and_extract_library(${NAME} ${EXT} ${URL} DIRECTORY)
-  set(TMP_BASE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
-  set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
-  file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
-  execute_process(
-    COMMAND cmake ..
-            -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
-    WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
-
-  if(WIN32)
-    execute_process(
-      COMMAND cmake --build . --config Release
-      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
-    execute_process(
-      COMMAND cmake --install .
-      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
-
-  else()
-  endif()
-
-  Find_Package(BZip2 REQUIRED)
-
-  if(NOT BZip2_FOUND)
-    error_abort()
-  else()
-    message("  <<build_bzip2>>")
-    message("  BZIP2_INCLUDE_DIR = " ${BZIP2_INCLUDE_DIR})
-    message("      BZIP2_LIBRARY = " ${BZIP2_LIBRARY})
   endif()
 
 endfunction()
@@ -280,9 +244,9 @@ function(build_zlib NAME EXT URL)
   else()
   endif()
 
-  set(ZLIB_ROOT ${TMP_INST_DIR})
+  #set(ZLIB_ROOT ${TMP_INST_DIR})
   Find_Package(ZLIB REQUIRED)
-  set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
+  #set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
 
   if(NOT ZLIB_FOUND)
     error_abort()
