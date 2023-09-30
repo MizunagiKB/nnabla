@@ -11,15 +11,12 @@ function(build_libarchive NAME EXT URL)
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
   execute_process(
     COMMAND cmake ..
-            -DBUILD_SHARED_LIBS=ON
+            -DBUILD_SHARED_LIBS=OFF
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
-            -DZLIB_ROOT=${ZLIB_ROOT}
-            -DPC_ZSTD_INCLUDEDIR=${PC_ZSTD_INCLUDEDIR}
-            -DPC_ZSTD_LIBDIR=${PC_ZSTD_LIBDIR}
             -DENABLE_MBEDTLS=OFF
             -DENABLE_NETTLE=OFF
             -DENABLE_OPENSSL=OFF
-            -DENABLE_LIBB2=ON
+            -DENABLE_LIBB2=OFF
             -DENABLE_LZ4=ON
             -DENABLE_LZO=OFF
             -DENABLE_LZMA=OFF
@@ -73,6 +70,9 @@ function(build_libarchive NAME EXT URL)
   endif()
 
 endfunction()
+# -DZLIB_ROOT=${ZLIB_ROOT}
+#-DZSTD_INCLUDE_DIR=${NBLR_ZSTD_INCLUDE_DIR}
+#-DZSTD_LIBRARY=${NBLR_ZSTD_LIBRARY}
 
 
 # =============================================================================
@@ -198,6 +198,8 @@ function(build_lz4 NAME EXT URL)
   execute_process(
     COMMAND cmake ../build/cmake
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
+            -DBUILD_SHARED_LIBS=OFF
+            -DBUILD_STATIC_LIBS=ON
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   execute_process(
@@ -207,14 +209,14 @@ function(build_lz4 NAME EXT URL)
     COMMAND cmake --install .
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-  Find_Package(LZ4)
+  Find_Package(lz4 REQUIRED)
 
-  if(NOT LZ4_FOUND)
+  if(NOT lz4_FOUND)
     error_abort()
   else()
     message("  <<build_lz4>>")
-    message("  LZ4_INCLUDE_DIR = " ${LZ4_INCLUDE_DIR})
-    message("      LZ4_LIBRARY = " ${LZ4_LIBRARY})
+    message("  lz4_INCLUDE_DIR = " ${lz4_INCLUDE_DIR})
+    message("      lz4_LIBRARY = " ${lz4_LIBRARY})
   endif()
 
 endfunction()
@@ -256,7 +258,7 @@ function(build_zlib NAME EXT URL)
     message("  ZLIB_INCLUDE_DIR = " ${ZLIB_INCLUDE_DIR})
     message("      ZLIB_LIBRARY = " ${ZLIB_LIBRARY})
     if(NOT WIN32)
-      set(ZLIB_FOUND true)
+      set(ZLIB_FOUND true PARENT_SCOPE)
       set(ZLIB_INCLUDE_DIR ${TMP_INST_DIR}/include PARENT_SCOPE)
       set(ZLIB_LIBRARY ${TMP_INST_DIR}/lib/zlib.a PARENT_SCOPE)
     endif()
@@ -285,21 +287,31 @@ function(build_zstd NAME EXT URL)
     COMMAND cmake --install .
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-  set(TMP_INC_DIR ${TMP_BASE_DIR}/lib)
-  set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd.lib)
+  #set(TMP_INC_DIR ${TMP_BASE_DIR}/lib)
+  #set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd.lib)
   #set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd_static.lib)
-  
-  set(PC_ZSTD_INCLUDEDIR ${TMP_INC_DIR} PARENT_SCOPE)
-  set(PC_ZSTD_LIBDIR ${TMP_LIB} PARENT_SCOPE)
 
-  Find_Package(ZSTD REQUIRED)
+  #set(PC_ZSTD_INCLUDEDIR ${TMP_INC_DIR} PARENT_SCOPE)
+  #set(PC_ZSTD_LIBDIR ${TMP_LIB} PARENT_SCOPE)
 
-  if(NOT ZSTD_FOUND)
+  Find_Package(zstd REQUIRED)
+
+  #set(NBLR_ZSTD_INCLUDE_DIR ${TMP_INST_DIR}/include)
+  #set(NBLR_ZSTD_LIBRARY ${TMP_INST_DIR}/lib/libzstd.a)
+
+  if(NOT zstd_FOUND)
     error_abort()
   else()
     message("  <<build_zstd>>")
-    message("  PC_ZSTD_INCLUDEDIR = " ${TMP_INC_DIR})
-    message("      PC_ZSTD_LIBDIR = " ${TMP_LIB})
+    # message("  ZSTD_FOUND = " ${ZSTD_FOUND})
+    #message("  ZSTD_INCLUDE_DIRS = " zstd::libzstd_static)
+    #message("       ZSTD_LIBRARY = " ${ZSTD_LIBRARY})
+    #message("     PC_ZSTD_INCLUDEDIR = " ${TMP_INC_DIR})
+    #message("         PC_ZSTD_LIBDIR = " ${TMP_LIB})
+    #message("  NBLR_ZSTD_INCLUDE_DIR = " ${NBLR_ZSTD_INCLUDE_DIR})
+    #message("      NBLR_ZSTD_LIBRARY = " ${NBLR_ZSTD_LIBRARY})
+    #set(NBLR_ZSTD_INCLUDE_DIR ${TMP_INST_DIR}/include PARENT_SCOPE)
+    #set(NBLR_ZSTD_LIBRARY ${TMP_INST_DIR}/lib/libzstd.a PARENT_SCOPE)
   endif()
 
 endfunction()

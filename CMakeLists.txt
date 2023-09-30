@@ -91,7 +91,9 @@ build_eigen(eigen-3.3.5 .zip https://gitlab.com/libeigen/eigen/-/archive/3.3.5/e
 # lz4
 build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
 # zlib
-build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip)
+if(WIN32)
+  build_zlib(zlib-1.3 .zip https://github.com/madler/zlib/archive/refs/tags/v1.3.zip)
+endif(WIN32)
 # zstd: set PC_ZSTD_INCLUDEDIR, PC_ZSTD_LIBDIR
 build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1.5.5.zip)
 # protobuf: set PROTOC_COMMAND
