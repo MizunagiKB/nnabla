@@ -64,6 +64,8 @@ if(MSVC)
   if(NOT NBLA_SHARED_LIBS STREQUAL ON)
     add_compile_options(-Dnnabla_static_lib)
   endif()
+else()
+  add_compile_options(-std=c++17)
 endif()
 
 
@@ -291,8 +293,10 @@ if(BUILD_CPP_LIB)
   ###############################################################################
   if(BUILD_CPP_UTILS)
     add_subdirectory(src/nbla_utils)
-    add_subdirectory(src/nbla_cli)
-    add_subdirectory(examples/cpp) 
+    if(WIN32)
+      add_subdirectory(src/nbla_cli)
+      add_subdirectory(examples/cpp) 
+    endif()
   endif()
 
   ###############################################################################
