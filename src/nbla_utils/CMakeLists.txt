@@ -101,7 +101,7 @@ if (WIN32)
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
-    Find_Package(HDF5 COMPONENTS C HL)
+    Find_Package(HDF5 COMPONENTS C HL REQUIRED)
     include_directories(
       ${HDF5_INCLUDE_DIRS}
     )
@@ -132,17 +132,23 @@ else()
                          /usr/local/android/arm64/lib/libarchive.so) 
   else()
     find_package(Protobuf REQUIRED)
-    find_package(LibArchive REQUIRED)
+    # use SubModule.cmake >>>
+    # find_package(LibArchive REQUIRED)
+    # use SubModule.cmake <<<
   endif()
 
   if (NNABLA_UTILS_WITH_HDF5)
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
-    Find_Package(HDF5 COMPONENTS C HL)
+    # use SubModule.cmake >>>
+    # Find_Package(HDF5 COMPONENTS C HL REQUIRED)
+    # use SubModule.cmake <<<
   endif()
 
-  find_package(ZLIB REQUIRED)
+  # use SubModule.cmake >>>
+  # find_package(ZLIB REQUIRED)
+  # use SubModule.cmake <<<
   if (NNABLA_UTILS_STATIC_LINK_DEPS)
     if (NNABLA_UTILS_WITH_HDF5)
       set(HDF5_LIBRARIES ${HDF5_LIBRARIES} ${CMAKE_DL_LIBS})
@@ -176,8 +182,6 @@ else()
       ${NBLA_LIBRARY_NAME}
       ${PROTOBUF_LIBRARY}
       ${LibArchive_LIBRARIES}
-      ${ZLIB_LIBRARIES}
-      ${ZSTD_LIBRARY}
       )
   endif()
   if (NNABLA_UTILS_WITH_HDF5)
