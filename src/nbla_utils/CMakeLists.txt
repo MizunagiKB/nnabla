@@ -101,7 +101,9 @@ if (WIN32)
     if (NNABLA_UTILS_STATIC_LINK_DEPS)
       set(HDF5_USE_STATIC_LIBRARIES 1)
     endif()
-    Find_Package(HDF5 COMPONENTS C HL REQUIRED)
+    # use SubModule.cmake >>>
+    # Find_Package(HDF5 COMPONENTS C HL REQUIRED)
+    # use SubModule.cmake <<<
     include_directories(
       ${HDF5_INCLUDE_DIRS}
     )

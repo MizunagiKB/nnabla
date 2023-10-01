@@ -9,9 +9,16 @@ function(build_libarchive NAME EXT URL)
   set(TMP_BASE_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/${NAME})
   set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
+
+  if(WIN32)
+    set(LibArchive_BUILD_SHARED_LIBS ON)
+  else(WIN32)
+    set(LibArchive_BUILD_SHARED_LIBS OFF)
+  endif(WIN32)
+
   execute_process(
     COMMAND cmake ..
-            -DBUILD_SHARED_LIBS=OFF
+            -DBUILD_SHARED_LIBS=${LibArchive_BUILD_SHARED_LIBS}
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
             -DENABLE_MBEDTLS=OFF
             -DENABLE_NETTLE=OFF
@@ -91,12 +98,22 @@ function(build_hdf5 NAME EXT URL)
   set(TMP_INST_DIR ${NBLA_ROOT_CMAKE_DIR}/third_party/inst_${NAME})
   file(MAKE_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
+  if(WIN32)
+    set(BUILD_STATIC_LIBS OFF)
+    set(BUILD_SHARED_LIBS ON)
+    set(ONLY_SHARED_LIBS ON)
+  else(WIN32)
+    set(BUILD_STATIC_LIBS ON)
+    set(BUILD_SHARED_LIBS OFF)
+    set(ONLY_SHARED_LIBS OFF)
+  endif(WIN32)
+
   execute_process(
     COMMAND cmake ..
             -DCMAKE_INSTALL_PREFIX=${TMP_INST_DIR}
-            -DBUILD_STATIC_LIBS=ON
-            -DONLY_SHARED_LIBS=OFF
-            -DBUILD_SHARED_LIBS=OFF
+            -DBUILD_STATIC_LIBS=${BUILD_STATIC_LIBS}
+            -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+            -DONLY_SHARED_LIBS=${ONLY_SHARED_LIBS}
             -DCPACK_SOURCE_ZIP=OFF
             -DHDF5_BUILD_HL_TOOLS=OFF
             -DHDF5_BUILD_TOOLS=OFF
@@ -119,32 +136,35 @@ function(build_hdf5 NAME EXT URL)
     COMMAND cmake --install .
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
+  set(HDF5_FOUND true)
+  set(HDF5_INCLUDE_DIR ${TMP_INST_DIR}/include)
+  set(HDF5_INCLUDE_DIRS ${TMP_INST_DIR}/include)
   if(WIN32)
-    #set(HDF5_ROOT ${TMP_INST_DIR})
-    Find_Package(HDF5 COMPONENTS C HL REQUIRED)
-    #set(HDF5_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
+    set(HDF5_LIBRARIES ${TMP_INST_DIR}/lib/hdf5.lib ${TMP_INST_DIR}/lib/hdf5_hl.lib)
+    set(HDF5_HL_LIBRARIES ${TMP_INST_DIR}/lib/hdf5_hl.lib)
   else()
-    set(HDF5_FOUND true)
-    set(HDF5_INCLUDE_DIR ${TMP_INST_DIR}/include)
-    set(HDF5_INCLUDE_DIRS ${TMP_INST_DIR}/include)
     set(HDF5_LIBRARIES ${TMP_INST_DIR}/lib/libhdf5.a ${TMP_INST_DIR}/lib/libhdf5_hl.a)
     set(HDF5_HL_LIBRARIES ${TMP_INST_DIR}/lib/libhdf5_hl.a)
-  endif()
+  endif(WIN32)
 
   if(NOT HDF5_FOUND)
     error_abort()
   else()
     message("  <<build_hdf5>>")
+    message("         HDF5_FOUND = " ${HDF5_FOUND})
     message("   HDF5_INCLUDE_DIR = " ${HDF5_INCLUDE_DIR})
     message("  HDF5_INCLUDE_DIRS = " ${HDF5_INCLUDE_DIRS})
     message("     HDF5_LIBRARIES = " ${HDF5_LIBRARIES})
     message("  HDF5_HL_LIBRARIES = " ${HDF5_HL_LIBRARIES})
-    if(NOT WIN32)
-      set(HDF5_INCLUDE_DIR ${TMP_INST_DIR}/include PARENT_SCOPE)
-      set(HDF5_INCLUDE_DIRS ${TMP_INST_DIR}/include PARENT_SCOPE)
+    set(HDF5_INCLUDE_DIR ${TMP_INST_DIR}/include PARENT_SCOPE)
+    set(HDF5_INCLUDE_DIRS ${TMP_INST_DIR}/include PARENT_SCOPE)
+    if(WIN32)
+      set(HDF5_LIBRARIES ${TMP_INST_DIR}/lib/hdf5.lib ${TMP_INST_DIR}/lib/hdf5_hl.lib PARENT_SCOPE)
+      set(HDF5_HL_LIBRARIES ${TMP_INST_DIR}/lib/hdf5_hl.lib PARENT_SCOPE)
+    else()
       set(HDF5_LIBRARIES ${TMP_INST_DIR}/lib/libhdf5.a ${TMP_INST_DIR}/lib/libhdf5_hl.a PARENT_SCOPE)
       set(HDF5_HL_LIBRARIES ${TMP_INST_DIR}/lib/libhdf5_hl.a PARENT_SCOPE)
-    endif()
+    endif(WIN32)
   endif()
 
 endfunction()
@@ -242,9 +262,7 @@ function(build_zlib NAME EXT URL)
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
   if(WIN32)
-    #set(ZLIB_ROOT ${TMP_INST_DIR})
     Find_Package(ZLIB REQUIRED)
-    #set(ZLIB_ROOT ${TMP_INST_DIR} PARENT_SCOPE)
   else()
     set(ZLIB_FOUND true)
     set(ZLIB_INCLUDE_DIR ${TMP_INST_DIR}/include)
@@ -287,31 +305,20 @@ function(build_zstd NAME EXT URL)
     COMMAND cmake --install .
     WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
 
-  #set(TMP_INC_DIR ${TMP_BASE_DIR}/lib)
-  #set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd.lib)
-  #set(TMP_LIB ${TMP_BASE_DIR}/build.cmake/lib/Release/zstd_static.lib)
-
-  #set(PC_ZSTD_INCLUDEDIR ${TMP_INC_DIR} PARENT_SCOPE)
-  #set(PC_ZSTD_LIBDIR ${TMP_LIB} PARENT_SCOPE)
+  if(WIN32)
+    execute_process(
+      COMMAND cmake -E copy
+              ${TMP_INST_DIR}/lib/zstd_static.lib
+              ${TMP_INST_DIR}/lib/zstd.lib
+      WORKING_DIRECTORY ${TMP_BASE_DIR}/build.cmake)
+  endif(WIN32)
 
   Find_Package(zstd REQUIRED)
-
-  #set(NBLR_ZSTD_INCLUDE_DIR ${TMP_INST_DIR}/include)
-  #set(NBLR_ZSTD_LIBRARY ${TMP_INST_DIR}/lib/libzstd.a)
 
   if(NOT zstd_FOUND)
     error_abort()
   else()
     message("  <<build_zstd>>")
-    # message("  ZSTD_FOUND = " ${ZSTD_FOUND})
-    #message("  ZSTD_INCLUDE_DIRS = " zstd::libzstd_static)
-    #message("       ZSTD_LIBRARY = " ${ZSTD_LIBRARY})
-    #message("     PC_ZSTD_INCLUDEDIR = " ${TMP_INC_DIR})
-    #message("         PC_ZSTD_LIBDIR = " ${TMP_LIB})
-    #message("  NBLR_ZSTD_INCLUDE_DIR = " ${NBLR_ZSTD_INCLUDE_DIR})
-    #message("      NBLR_ZSTD_LIBRARY = " ${NBLR_ZSTD_LIBRARY})
-    #set(NBLR_ZSTD_INCLUDE_DIR ${TMP_INST_DIR}/include PARENT_SCOPE)
-    #set(NBLR_ZSTD_LIBRARY ${TMP_INST_DIR}/lib/libzstd.a PARENT_SCOPE)
   endif()
 
 endfunction()

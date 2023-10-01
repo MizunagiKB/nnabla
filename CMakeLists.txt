@@ -88,7 +88,8 @@ endif()
 set(PYTHON_COMMAND "${PP}")
 
 
-# eigen(download only)
+# eigen
+# (no Build)
 build_eigen(eigen-3.3.5 .zip https://gitlab.com/libeigen/eigen/-/archive/3.3.5/eigen-3.3.5.zip)
 # lz4
 build_lz4(lz4-1.9.4 .zip https://github.com/lz4/lz4/archive/refs/tags/v1.9.4.zip)
@@ -102,7 +103,8 @@ build_zstd(zstd-1.5.5 .zip https://github.com/facebook/zstd/archive/refs/tags/v1
 build_protobuf(protobuf-3.20.1 .zip https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.20.1.zip)
 # libarchive
 build_libarchive(libarchive-3.7.2 .zip https://github.com/libarchive/libarchive/archive/refs/tags/v3.7.2.zip)
-# hdf5
+# hdf5: set HDF5_INCLUDE_DIR, HDF5_INCLUDE_DIRS, HDF5_LIBRARIES, HDF5_HL_LIBRARIES
+# (no Find_Package)
 build_hdf5(hdf5-hdf5-1_12_2 .zip https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.zip)
 
 
@@ -293,10 +295,10 @@ if(BUILD_CPP_LIB)
   ###############################################################################
   if(BUILD_CPP_UTILS)
     add_subdirectory(src/nbla_utils)
-    if(WIN32)
-      add_subdirectory(src/nbla_cli)
-      add_subdirectory(examples/cpp) 
-    endif()
+    # 
+    # add_subdirectory(src/nbla_cli)
+    # add_subdirectory(examples/cpp) 
+    # 
   endif()
 
   ###############################################################################
